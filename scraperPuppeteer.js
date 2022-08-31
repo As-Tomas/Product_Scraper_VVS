@@ -50,14 +50,6 @@ async function scrapeProductPage(url) {
     const textelCollumnName2 = await elCollumnName2.getProperty('textContent');
     const collumnName2 = await textelCollumnName2.jsonValue();
 
-    const [elDescription2] = await page.$x('//*[@id="specifications-content"]/div/div/ul/li[1]/p');
-    const textelDescription2 = await elDescription2.getProperty('textContent');
-    const specDescription1 = await textelDescription2.jsonValue();
-
-    const [elval2] = await page.$x('//*[@id="specifications-content"]/div/div/ul/li[1]/text()');
-    const textelelval2 = await elval2.getProperty('textContent');
-    const specValue1 = await textelelval2.jsonValue();
-
     const specifications =[];
 
     const productsHandles = await page.$$('#specifications-content > div > div > ul > li');
@@ -84,12 +76,11 @@ async function scrapeProductPage(url) {
         }
     }
 
-    console.log(specifications)
 
     browser.close();
-    // console.log({productName, picture1, images, brand, productNumber, ShortDescription,
-    //     collumnName, description, collumnName2, specDescription1, specValue1
-    // });
+    console.log({productName, picture1, images, brand, productNumber, ShortDescription,
+        collumnName, description, collumnName2, specDescription1, specValue1, specifications
+    });
 }
 
 
