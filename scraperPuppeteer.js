@@ -54,9 +54,8 @@ async function scrapeProductPage(url) {
 
     const productsHandles = await page.$$('#specifications-content > div > div > ul > li');
     for (const producthandle of productsHandles){
-        console.log("run1");
+        
         try {
-            console.log("run2");
             const title = await page.evaluate(
                 (el) => el.querySelector(" p").textContent,
                 producthandle
@@ -76,10 +75,39 @@ async function scrapeProductPage(url) {
         }
     }
 
+//etim
+    const [elCollumnName3] = await page.$x('//*[@id="etimspecifications-header"]/div[1]/h2');
+    const textelCollumnName3 = await elCollumnName3.getProperty('textContent');
+    const collumnName3 = await textelCollumnName3.jsonValue();
+
+    const etim =[]; 
+
+    const productsHandlesetim = await page.$$('#etimspecifications-content > div > div > ul > li');
+    for (const producthandle of productsHandlesetim){
+        
+        try {
+            const title = await page.evaluate(
+                (el) => el.querySelector(" p").textContent,
+                producthandle
+            );
+
+            const value = await page.evaluate(
+                (el) => el.textContent,
+                producthandle
+            );
+
+            let newValue = value.replace(title, "");
+
+            etim.push({title: title, value: newValue})
+
+        } catch (error) {
+            console.log("error", error)
+        }
+    }
 
     browser.close();
     console.log({productName, picture1, images, brand, productNumber, ShortDescription,
-        collumnName, description, collumnName2, specDescription1, specValue1, specifications
+        collumnName, description, collumnName2, specifications, etim
     });
 }
 
