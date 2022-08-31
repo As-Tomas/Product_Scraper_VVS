@@ -37,22 +37,60 @@ async function scrapeProductPage(url) {
     const textShortDescription = await elShortDescription.getProperty('textContent');
     const ShortDescription = await textShortDescription.jsonValue();
    
-
     const [elCollumnName] = await page.$x('//*[@id="description-header"]/div[1]/h2');
     const textelCollumnName = await elCollumnName.getProperty('textContent');
     const collumnName = await textelCollumnName.jsonValue();
 
-    const [elDescription] = await page.$x('//*[@id="description-header"]/div[1]/h2');
+    const [elDescription] = await page.$x('//*[@id="description-content"]/div/div/div/text()');
     const textelDescription = await elDescription.getProperty('textContent');
     const description = await textelDescription.jsonValue();
 
+//specifications
+    const [elCollumnName2] = await page.$x('//*[@id="specifications-header"]/div[1]/h2');
+    const textelCollumnName2 = await elCollumnName2.getProperty('textContent');
+    const collumnName2 = await textelCollumnName2.jsonValue();
+
+    const [elDescription2] = await page.$x('//*[@id="specifications-content"]/div/div/ul/li[1]/p');
+    const textelDescription2 = await elDescription2.getProperty('textContent');
+    const specDescription1 = await textelDescription2.jsonValue();
+
+    const [elval2] = await page.$x('//*[@id="specifications-content"]/div/div/ul/li[1]/text()');
+    const textelelval2 = await elval2.getProperty('textContent');
+    const specValue1 = await textelelval2.jsonValue();
+
+    const specifications =[];
+
+    const productsHandles = await page.$$('#specifications-content > div > div > ul > li');
+    for (const producthandle of productsHandles){
+        console.log("run1");
+        try {
+            console.log("run2");
+            const title = await page.evaluate(
+                (el) => el.querySelector(" p").textContent,
+                producthandle
+            );
+
+            const value = await page.evaluate(
+                (el) => el.textContent,
+                producthandle
+            );
+
+            let newValue = value.replace(title, "");
+
+            specifications.push({title: title, value: newValue})
+
+        } catch (error) {
+            console.log("error", error)
+        }
+    }
+
+    console.log(specifications)
 
     browser.close();
-    console.log({productName, picture1, images, brand, productNumber, ShortDescription, 
-        collumnName, description,  
-    });
+    // console.log({productName, picture1, images, brand, productNumber, ShortDescription,
+    //     collumnName, description, collumnName2, specDescription1, specValue1
+    // });
 }
 
-//scrapeProductPage('https://www.dahl.no/varme/beredere/boligberedere/saga-bd_1507791616794?v=BD_8000554');
 
 scrapeProductPage(siteLink.productLink);
