@@ -28,8 +28,9 @@ async function scrapeProductPage(url) {
     const [elbrand] = await page.$x('//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/p',);
     const brandText = await elbrand.getProperty('textContent');
     const brand = await brandText.jsonValue();
-
-    const [elProductNumber] = await page.$x('//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[2]');
+                                             
+                                             //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[2]  returs gap beatween strings
+    const [elProductNumber] = await page.$x('//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[3]');
     const prodNr = await elProductNumber.getProperty('textContent');
     const productNumber = await prodNr.jsonValue();
 
@@ -105,11 +106,25 @@ async function scrapeProductPage(url) {
         }
     }
 
+    const [elCollumnName4] = await page.$x('//*[@id="documents-header"]/div[1]/h2');
+    const textelCollumnName4 = await elCollumnName4.getProperty('textContent');
+    const collumnName4 = await textelCollumnName4.jsonValue();
+
+    const [el3] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
+    const textContentel3 = await el3.getProperty('textContent');
+    const documentstextContent = await textContentel3.jsonValue();
+
+    const [el4] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
+    const href = await el4.getProperty('href');
+    const documentsLink = await href.jsonValue();
+
+
     browser.close();
     console.log({productName, picture1, images, brand, productNumber, ShortDescription,
-        collumnName, description, collumnName2, specifications, etim
+        collumnName, description, collumnName2, specifications, etim, collumnName4, documentstextContent, documentsLink
     });
 }
 
 
 scrapeProductPage(siteLink.productLink);
+
