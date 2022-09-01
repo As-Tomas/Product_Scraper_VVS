@@ -73,9 +73,27 @@ async function scrapeProductPage(url) {
     const prodNr = await elProductNumber.getProperty('textContent');
     const productNumber = await prodNr.jsonValue();
 
-    const [elShortDescription] = await page.$x('//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/p/text()');
-    const textShortDescription = await elShortDescription.getProperty('textContent');
-    const ShortDescription = await textShortDescription.jsonValue();
+    let ShortDescription = '';
+    try {
+        const [elShortDescription] = await page.$x('//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/p/text()');
+        const textShortDescription = await elShortDescription.getProperty('textContent');
+        ShortDescription = await textShortDescription.jsonValue();   
+    } catch (error) {}
+
+    let saleQuatity = '';
+    try {
+        const [elsaleQuatity] = await page.$x('//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/div[1]/div[1]');
+        const textelsaleQuatity = await elsaleQuatity.getProperty('textContent');
+        saleQuatity = await textelsaleQuatity.jsonValue();
+    } catch (error) {}
+
+    let price = ''
+    try {
+        const [elprice] = await page.$x('//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/div[1]/span/div/span');
+        const texteelprice = await elprice.getProperty('textContent');
+        price = await texteelprice.jsonValue();
+    } catch (error) {}
+
    
     const [elCollumnName] = await page.$x('//*[@id="description-header"]/div[1]/h2');
     const textelCollumnName = await elCollumnName.getProperty('textContent');
@@ -121,7 +139,7 @@ async function scrapeProductPage(url) {
     const collumnName3 = await textelCollumnName3.jsonValue();
 
     const etim =[]; 
-
+    
     const productsHandlesetim = await page.$$('#etimspecifications-content > div > div > ul > li');
     for (const producthandle of productsHandlesetim){
         
@@ -157,12 +175,44 @@ async function scrapeProductPage(url) {
     const href = await el4.getProperty('href');
     const documentsLink = await href.jsonValue();
 
+    let collumnNameVariations ='';
+    const variations =[];
+    try {
+        const [elCollumnName5] = await page.$x('//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/h3');
+        const textelCollumnName5 = await elCollumnName5.getProperty('textContent');
+        collumnNameVariations = await textelCollumnName5.jsonValue();
+
+        const productsHandlesVar = await page.$$('#content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(2) > div.b2.go.dx.gp');
+    for (const producthandle of productsHandlesVar){
+        
+        try {
+            const title = await page.evaluate(
+                (el) => el.querySelector(" p").textContent,
+                producthandle
+            );
+
+            const value = await page.evaluate(
+                (el) => el.textContent,
+                producthandle
+            );
+
+            let newValue = value.replace(title, "");
+
+            variations.push({title: title, value: newValue})
+
+        } catch (error) {
+            console.log("error", error)
+        }
+    }
+
+    } catch (error) {}
     
     
 
     browser.close();
-    console.log({productName, coverPic, pic1, pic2, pic3, pic4, brand, productNumber, ShortDescription,
-        collumnName, description, collumnName2, specifications, etim, collumnName4, documentstextContent, documentsLink, 
+    console.log({productName, coverPic, pic1, pic2, pic3, pic4, brand, productNumber, ShortDescription, saleQuatity, price,
+        collumnName, description, collumnName2, specifications,collumnName3, etim, collumnName4, documentstextContent, documentsLink, 
+        collumnNameVariations, 
     });
 }
 
