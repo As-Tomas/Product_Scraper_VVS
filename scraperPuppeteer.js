@@ -182,29 +182,43 @@ async function scrapeProductPage(url) {
         const textelCollumnName5 = await elCollumnName5.getProperty('textContent');
         collumnNameVariations = await textelCollumnName5.jsonValue();
 
-        const productsHandlesVar = await page.$$('#content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(2) > div.b2.go.dx.gp');
+       // #content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(2) > div.b2.go.dx.gp > article:nth-child(1)
+        const productsHandlesVar = await page.$$('#content-container > main > div > div:nth-child(2) > div:nth-child(2) > div > article');
+        //#content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(2) > div > article:nth-child(1)
+        //#content-container > main > div.n.o.c1.q > div:nth-child(2) > div.n.o.p.b1.hc > div > div > div > div > div:nth-child(1) > article > a > section
     for (const producthandle of productsHandlesVar){
-        
+        //#content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(2) > div.b2.go.dx.gp > article:nth-child(1) > a > section > div:nth-child(1) > h3
         try {
             const title = await page.evaluate(
-                (el) => el.querySelector(" p").textContent,
+               // article:nth-child(1) > a > section > div:nth-child(1) > h3
+                (el) => el.querySelector(" a > section > div> h3").textContent,
                 producthandle
             );
 
-            const value = await page.evaluate(
-                (el) => el.textContent,
+            const variantproductNumber = await page.evaluate(
+                (el) => el.querySelector(" p ").textContent,
                 producthandle
             );
+            // const links = await page.evaluate(function getUrls() {
+            //     return Array.from(document.querySelectorAll('a cite').values()).
+            //       map(el => el.innerHTML);
+            //   });
 
-            let newValue = value.replace(title, "");
+            // const elvariationUrl = await page.evaluate(                
+            //      (el) => el.querySelector('a').getProperty('href'),
+            //     // .querySelector(" a > section > div> h3").textContent,
+            //      producthandle
+            // );
+            //const variationUrl = await elvariationUrl.jsonValue();
 
-            variations.push({title: title, value: newValue})
+            //let newValue = value.replace(title, "");
+
+            variations.push({title: title, variantionProductNumber: variantproductNumber})
 
         } catch (error) {
             console.log("error", error)
         }
     }
-
     } catch (error) {}
     
     
@@ -212,9 +226,10 @@ async function scrapeProductPage(url) {
     browser.close();
     console.log({productName, coverPic, pic1, pic2, pic3, pic4, brand, productNumber, ShortDescription, saleQuatity, price,
         collumnName, description, collumnName2, specifications,collumnName3, etim, collumnName4, documentstextContent, documentsLink, 
-        collumnNameVariations, 
+        collumnNameVariations, variations
     });
 }
 
-
 scrapeProductPage(siteLink.productLink);
+
+
