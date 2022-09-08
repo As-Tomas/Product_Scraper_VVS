@@ -1,3 +1,4 @@
+const { ConsoleMessage } = require("puppeteer");
 const puppeteer = require("puppeteer-extra");
 const pluginStealth = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(pluginStealth());
@@ -33,6 +34,50 @@ async function scrapeProductPage(url) {
     async function scrape(productUrl) {
         await page.goto(productUrl, { waitUntil: "networkidle2" });
         await page.waitForTimeout(1000);
+
+        let category1 ='';
+        try {
+            const [el01] = await page.$x(
+                '//*[@id="content-container"]/main/div[1]/ul/li[1]/a'
+            );
+            const textel01 = await el01.getProperty("textContent");
+            category1 = await textel01.jsonValue();            
+        } catch (error) {
+            console.log('cant find categori 1')       
+        }
+
+        let category2 ='';
+        try {
+            const [el02] = await page.$x(
+                '//*[@id="content-container"]/main/div[1]/ul/li[2]/a'
+            );
+            const textel02 = await el02.getProperty("textContent");
+            category2 = await textel02.jsonValue();            
+        } catch (error) {   
+            console.log('cant find categori 2')            
+        }
+
+        let category3 ='';
+        try {
+            const [el03] = await page.$x(
+                '//*[@id="content-container"]/main/div[1]/ul/li[3]/a'
+            );
+            const textel03 = await el03.getProperty("textContent");
+            category3 = await textel03.jsonValue();            
+        } catch (error) {            
+            console.log('cant find categori 3')   
+        }
+
+        let category4 ='';
+        try {
+            const [el04] = await page.$x(
+                '//*[@id="content-container"]/main/div[1]/ul/li[4]/a'
+            );
+            const textel04 = await el04.getProperty("textContent");
+            category4 = await textel04.jsonValue();            
+        } catch (error) {            
+            console.log('cant find categori 4')   
+        }
 
         const [el] = await page.$x(
             '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/h2'
@@ -284,6 +329,10 @@ async function scrapeProductPage(url) {
             }
         } catch (error) { }
         console.log({
+            category1,
+            category2,
+            category3,
+            category4,
             productName,
             coverPic,
             pic1,
@@ -310,6 +359,10 @@ async function scrapeProductPage(url) {
 
         // bulding CSV Writer data sets
         let header= [
+            { id: "category1", title: "CATEGORY 1" },
+            { id: "category2", title: "CATEGORY 2" },
+            { id: "category3", title: "CATEGORY 3" },
+            { id: "category4", title: "CATEGORY 4" },
             { id: "productName", title: "PRODUC NAME" },
             { id: "coverPic", title: "COVER PICTURE" },
             { id: "pic1", title: "pic1"},
@@ -329,7 +382,8 @@ async function scrapeProductPage(url) {
         //console.log("LOGING HEADER: -----------", header);
 
         const test = 
-            { productName: productName, coverPic: coverPic, pic1: pic1, pic2: pic2, pic3: pic3, pic4: pic4, 
+            { category1: category1, category2: category2, category3: category3, category4: category4, 
+                productName: productName, coverPic: coverPic, pic1: pic1, pic2: pic2, pic3: pic3, pic4: pic4, 
                 brand: brand, productNumber: productNumber, ShortDescription: ShortDescription, saleQuatity: saleQuatity,
                 price: price, collumnName: collumnName, description: description, collumnName2: collumnName2, 
              };
