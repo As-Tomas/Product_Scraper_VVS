@@ -210,7 +210,7 @@ async function scrapeProductPage(url) {
 
                 let newValue = value.replace(title, "");
 
-                etim.push({ id: title, title:title, value: newValue });
+                etim.push({ title:title, value: newValue });
             } catch (error) {
                 console.log("error", error);
             }
@@ -308,7 +308,7 @@ async function scrapeProductPage(url) {
             variations,
         });
 
-        
+        // bulding CSV Writer data sets
         let header= [
             { id: "productName", title: "PRODUC NAME" },
             { id: "coverPic", title: "COVER PICTURE" },
@@ -326,7 +326,7 @@ async function scrapeProductPage(url) {
             { id: "collumnName2", title: "collumnName2"},
         ]
 
-        console.log("LOGING HEADER: -----------", header);
+        //console.log("LOGING HEADER: -----------", header);
 
         const test = 
             { productName: productName, coverPic: coverPic, pic1: pic1, pic2: pic2, pic3: pic3, pic4: pic4, 
@@ -334,20 +334,14 @@ async function scrapeProductPage(url) {
                 price: price, collumnName: collumnName, description: description, collumnName2: collumnName2, 
              };
 
-            // for (const iterator of specifications) {
-            //     test = iterator.title  = iterator.title;
-            //     test.iterator.value = iterator.value;
-            //     //header.push({id : iterator.title, title : iterator.title});
-            // } 
-
-        console.log("-------------------------test-----------------------");
-        console.log(test);
+        //console.log("-------------------------test-----------------------");
+        //console.log(test);
     
+        
         // remove colon from titles and add to header
     
         let valueNr = 0;
 
-        console.log(specifications);
         for (const iterator of specifications) {
             let title = iterator.title;
             let newTitle = title.replace(": ", "");
@@ -358,10 +352,36 @@ async function scrapeProductPage(url) {
             test['value ' + valueNr ] = iterator.value;
             valueNr++;
         };
+        header.push({ id: 'collumnName3' , title: collumnName3 });
+        test['collumnName3'] = collumnName3;
+
+        for (const iterator of etim) {
+            let title = iterator.title;
+            let newTitle = title.replace(": ", "");
+            iterator.title = newTitle;
+            header.push({ id: iterator.title, title: iterator.title });
+            header.push({ id: 'value ' + valueNr, title: 'value ' + valueNr });
+            test[iterator.title] = iterator.title;
+            test['value ' + valueNr ] = iterator.value;
+            valueNr++;
+        };
+
+        for (const iterator of variations) {
+            let title = iterator.title;
+            //let newTitle = title.replace(": ", "");
+            iterator.title = title;
+            header.push({ id: iterator.title, title: iterator.title });
+            header.push({ id: 'variantionProductNumber ' + valueNr, title: 'variantionProductNumber ' + valueNr });
+            test[iterator.title] = iterator.title;
+            test['variantionProductNumber ' + valueNr ] = iterator.variantionProductNumber;
+            valueNr++;
+        };
+
+        
         
         //  CREATE NEW CSV DOCUMENT
         const csv = createCSV({
-            path: "scrapedProduct.csv",
+            path: `${productName}.csv`,
             header: header
         });
 
