@@ -317,11 +317,11 @@ async function scrapeProductPage(url) {
                     // );
                     //const variationUrl = await elvariationUrl.jsonValue();
 
-                    //let newValue = value.replace(title, "");
+                    let newValue = variantproductNumber.replace("NRF ", "");
 
                     variations.push({
                         title: title,
-                        variantionProductNumber: variantproductNumber,
+                        variantionProductNumber: newValue,
                     });
                 } catch (error) {
                     console.log("error", error);
