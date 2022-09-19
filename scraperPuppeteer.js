@@ -5,7 +5,31 @@ puppeteer.use(pluginStealth());
 const siteLink = require("./project-objectives");
 const createCSV = require("csv-writer").createObjectCsvWriter;
 
-totalSrapes = 0;
+let totalSrapes = 0;
+
+let mainHeader = [
+    { id: "category1", title: "CATEGORY 1" },
+{ id: "category2", title: "CATEGORY 2" },
+{ id: "category3", title: "CATEGORY 3" },
+{ id: "category4", title: "CATEGORY 4" },
+{ id: "productName", title: "PRODUC NAME" },
+{ id: "coverPic", title: "COVER PICTURE" },
+{ id: "pic1", title: "pic1"},
+{ id: "pic2", title: "pic2"},
+{ id: "pic3", title: "pic3"},
+{ id: "pic4", title: "pic4"},
+{ id: "brand", title: "brand"},
+{ id: "productNumber", title: "productNumber"},
+{ id: "ShortDescription", title: "ShortDescription"},
+{ id: "saleQuatity", title: "saleQuatity"},
+{ id: "price", title: "price"},
+{ id: "collumnName", title: "collumnName"},
+{ id: "description", title: "description"},
+{ id: "collumnName2", title: "collumnName2"},
+];
+
+let mainSource = [];
+
 
 async function scrapeProductPage(url) {
     const browser = await puppeteer.launch({ headless: false });
@@ -328,34 +352,36 @@ async function scrapeProductPage(url) {
                 }
             }
         } catch (error) { }
-        console.log({
-            category1,
-            category2,
-            category3,
-            category4,
-            productName,
-            coverPic,
-            pic1,
-            pic2,
-            pic3,
-            pic4,
-            brand,
-            productNumber,
-            ShortDescription,
-            saleQuatity,
-            price,
-            collumnName,
-            description,
-            collumnName2,
-            specifications,
-            collumnName3,
-            etim,
-            collumnName4,
-            documentstextContent,
-            documentsLink,
-            collumnNameVariations,
-            variations,
-        });
+        // console.log({
+        //     category1,
+        //     category2,
+        //     category3,
+        //     category4,
+        //     productName,
+        //     coverPic,
+        //     pic1,
+        //     pic2,
+        //     pic3,
+        //     pic4,
+        //     brand,
+        //     productNumber,
+        //     ShortDescription,
+        //     saleQuatity,
+        //     price,
+        //     collumnName,
+        //     description,
+        //     collumnName2,
+        //     specifications,
+        //     collumnName3,
+        //     etim,
+        //     collumnName4,
+        //     documentstextContent,
+        //     documentsLink,
+        //     collumnNameVariations,
+        //     variations,
+        // });
+
+// working with data------------------------------------------------ ↓↓↓
 
         // bulding CSV Writer data sets
         let header= [
@@ -379,17 +405,19 @@ async function scrapeProductPage(url) {
             { id: "collumnName2", title: "collumnName2"},
         ]
 
+        
+
         //console.log("LOGING HEADER: -----------", header);
 
-        const test = 
+        const source = 
             { category1: category1, category2: category2, category3: category3, category4: category4, 
                 productName: productName, coverPic: coverPic, pic1: pic1, pic2: pic2, pic3: pic3, pic4: pic4, 
                 brand: brand, productNumber: productNumber, ShortDescription: ShortDescription, saleQuatity: saleQuatity,
                 price: price, collumnName: collumnName, description: description, collumnName2: collumnName2, 
              };
 
-        //console.log("-------------------------test-----------------------");
-        //console.log(test);
+        //console.log("-------------------------source-----------------------");
+        //console.log(source);
     
         
         // remove colon from titles and add to header
@@ -401,23 +429,59 @@ async function scrapeProductPage(url) {
             let newTitle = title.replace(": ", "");
             iterator.title = newTitle;
             header.push({ id: iterator.title, title: iterator.title });
-            header.push({ id: 'value ' + valueNr, title: 'value ' + valueNr });
-            test[iterator.title] = iterator.title;
-            test['value ' + valueNr ] = iterator.value;
-            valueNr++;
+            header.push({ id: 'spec ' + iterator.title, title: 'spec ' + iterator.title });
+            source[iterator.title] = iterator.title;
+            source['spec ' + iterator.title ] = iterator.value;
+            //--add to maisSource
+            
+            (function add(mainHeader, iterator) {
+
+                const found = mainHeader.some(el => el.id === iterator.title);
+                if (!found) console.log("NOT FOUND: ", iterator.title );
+                if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
+                if (!found) mainHeader.push({ id: 'spec ' + iterator.title, title: 'spec ' + iterator.title });
+                return mainHeader;
+
+              })(mainHeader, iterator);
+            //-- end of it
+
+            
         };
         header.push({ id: 'collumnName3' , title: collumnName3 });
-        test['collumnName3'] = collumnName3;
+        source['collumnName3'] = collumnName3;
+        //--add to maisSource
+            
+        (function add(mainHeader, collumnName3) {
+
+            const found = mainHeader.some(el => el.id === collumnName3);
+            if (!found) mainHeader.push({ id: 'collumnName3' , title: collumnName3 });
+            return mainHeader;
+
+          })(mainHeader, collumnName3);
+        //-- end of it
 
         for (const iterator of etim) {
             let title = iterator.title;
             let newTitle = title.replace(": ", "");
             iterator.title = newTitle;
             header.push({ id: iterator.title, title: iterator.title });
-            header.push({ id: 'value ' + valueNr, title: 'value ' + valueNr });
-            test[iterator.title] = iterator.title;
-            test['value ' + valueNr ] = iterator.value;
-            valueNr++;
+            header.push({ id: 'etim ' + iterator.title, title: 'etim ' + iterator.title });
+            source[iterator.title ] = iterator.title;
+            source['etim ' + iterator.title] = iterator.value;
+    
+            //--add to maisSource
+            
+            (function add(mainHeader, iterator) {
+
+                const found = mainHeader.some(el => el.id === iterator.title);
+                if (!found) console.log("NOT FOUND: ", iterator.title );
+                if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
+                if (!found) mainHeader.push({ id: 'etim ' + iterator.title, title: 'etim ' + iterator.title });
+                return mainHeader;
+
+              })(mainHeader, iterator);
+            //-- end of it
+            
         };
 
         for (const iterator of variations) {
@@ -426,27 +490,43 @@ async function scrapeProductPage(url) {
             iterator.title = title;
             header.push({ id: iterator.title, title: iterator.title });
             header.push({ id: 'variantionProductNumber ' + valueNr, title: 'variantionProductNumber ' + valueNr });
-            test[iterator.title] = iterator.title;
-            test['variantionProductNumber ' + valueNr ] = iterator.variantionProductNumber;
+            source[iterator.title] = iterator.title;
+            source['variantionProductNumber ' + valueNr ] = iterator.variantionProductNumber;
+            //--add to maisSource
+            
+            (function add(mainHeader, iterator) {
+
+                const found = mainHeader.some(el => el.id === iterator.title);
+                if (!found) console.log("NOT FOUND: ", iterator.title );
+                if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
+                if (!found) mainHeader.push({ id: 'variantionProductNumber ' + valueNr, title: 'variantionProductNumber ' + valueNr  });
+                return mainHeader;
+
+              })(mainHeader, iterator);
+            //-- end of it
             valueNr++;
         };
 
-        
-        
-        //  CREATE NEW CSV DOCUMENT
-        const csv = createCSV({
-            path: `${productName}.csv`,
-            header: header
-        });
+        header.push({ id: 'productUrl ', title: 'productUrl ' });
+        mainHeader.push({ id: 'productUrl ', title: 'productUrl ' });
+        source['productUrl ' ] = productUrl;
 
-        //  WRITE DATA ROWS
-        await csv.writeRecords([
-            test
+        mainSource.push(source);
+        
+        // //  CREATE NEW CSV DOCUMENT
+        // const csv = createCSV({
+        //     path: `${productName}.csv`,
+        //     header: header
+        // });
+
+        // //  WRITE DATA ROWS
+        // await csv.writeRecords([
+        //     source
                 
-            ])
-            .then(() => {
-                console.log("Done!");
-            });
+        //     ])
+        //     .then(() => {
+        //         console.log("Done!");
+        //     });
 
 
         const urlsVariants = await page.evaluate(() =>
@@ -458,7 +538,7 @@ async function scrapeProductPage(url) {
             )
         );
 
-        console.log("urlsVariants", urlsVariants);
+        // console.log("urlsVariants", urlsVariants);
 
         if (scrapeOneLevelDeep) {
             if (urlsVariants.length > 0) {
@@ -472,6 +552,13 @@ async function scrapeProductPage(url) {
 
         totalSrapes++;
         console.log("totatl scrapes: ", totalSrapes);
+
+        // console.log("-------------------------header-----------------------");
+        // console.log(header);
+        console.log("-------------------------mainHeader-----------------------");
+        console.log(mainHeader);
+        // console.log("-------------------------mainSource-----------------------");
+        // console.log(mainSource);
     }
 
     await scrape(url);
@@ -484,6 +571,23 @@ async function scrapeProductPage(url) {
         scrapeOneLevelDeep = true;
     }
 
+
+    //  CREATE NEW CSV DOCUMENT
+    const csv = createCSV({
+        // path: `${productName}.csv`,
+        path: 'results.csv',
+        header: mainHeader
+    });
+
+    //  WRITE DATA ROWS
+    await csv.writeRecords(
+        mainSource
+            
+        )
+        .then(() => {
+            console.log("Done!");
+        });
+        
     browser.close();
 }
 
@@ -506,17 +610,7 @@ async function getJobsZipRecruiter(params) {
         );
 
         console.log(urls);
-        // const zipRecruiterJobs = [];
-
-        // for (const url of urls) {
-        //   await page.goto(url);
-        //   if (!page.url().startsWith('https://www.ziprecruiter.com/')) continue;
-        //   await page.waitForSelector('h1.job_title');
-        //   // Get the data you want here and push it into the data array
-        //   zipRecruiterJobs.push(
-        //     await page.evaluate(() => document.querySelector('h1.job_title').innerText)
-        //   );
-        // }
+        
 
         await browser.close();
         // console.log(zipRecruiterJobs);
