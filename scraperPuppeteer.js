@@ -423,7 +423,7 @@ async function scrapeProductPage(url) {
         
         // remove colon from titles and add to header
     
-        let valueNr = 0;
+        
 
         for (const iterator of specifications) {
             let title = iterator.title;
@@ -448,14 +448,23 @@ async function scrapeProductPage(url) {
 
             
         };
-        header.push({ id: 'collumnName3' , title: collumnName3 });
-        source['collumnName3'] = collumnName3;
+
+        (function add(header, item) {
+
+            const found = header.some(el => el.id === item);
+            if (!found) console.log("NOT FOUND: ", item );
+            if (!found) header.push({ id: item, title: item });
+            if (!found) source['collumnName3'] = collumnName3;
+            return header;
+
+          })(header, collumnName3);
+
         //--add to maisSource
             
-        (function add(mainHeader, collumnName3) {
+        (function add(mainHeader, item) {
 
-            const found = mainHeader.some(el => el.id === collumnName3);
-            if (!found) mainHeader.push({ id: 'collumnName3' , title: collumnName3 });
+            const found = mainHeader.some(el => el.id === item);
+            if (!found) mainHeader.push({ id: item , title: item });
             return mainHeader;
 
           })(mainHeader, collumnName3);
@@ -486,13 +495,10 @@ async function scrapeProductPage(url) {
         };
 
         for (const iterator of variations) {
-            let title = iterator.title;
-            //let newTitle = title.replace(": ", "");
-            iterator.title = title;
             header.push({ id: iterator.title, title: iterator.title });
-            header.push({ id: 'variantionProductNumber ' + valueNr, title: 'variantionProductNumber ' + valueNr });
+            header.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
             source[iterator.title] = iterator.title;
-            source['variantionProductNumber ' + valueNr ] = iterator.variantionProductNumber;
+            source['variantion ' + iterator.title ] = iterator.variantionProductNumber;
             //--add to maisSource
             
             (function add(mainHeader, iterator) {
@@ -500,16 +506,26 @@ async function scrapeProductPage(url) {
                 const found = mainHeader.some(el => el.id === iterator.title);
                 if (!found) console.log("NOT FOUND: ", iterator.title );
                 if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
-                if (!found) mainHeader.push({ id: 'variantionProductNumber ' + valueNr, title: 'variantionProductNumber ' + valueNr  });
+                if (!found) mainHeader.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
                 return mainHeader;
 
               })(mainHeader, iterator);
             //-- end of it
-            valueNr++;
         };
 
-        header.push({ id: 'productUrl ', title: 'productUrl ' });
-        mainHeader.push({ id: 'productUrl ', title: 'productUrl ' });
+        //--add to maisSource
+            
+        (function add(mainHeader, item) {
+
+            const found = mainHeader.some(el => el.id === item);
+            if (!found) console.log("NOT FOUND: ", item );
+            if (!found) mainHeader.push({ id: item, title: item });
+            if (!found) header.push({ id: item, title: item });
+            return mainHeader;
+
+          })(mainHeader, 'productUrl ');
+        //-- end of it
+
         source['productUrl ' ] = productUrl;
 
         mainSource.push(source);
