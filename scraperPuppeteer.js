@@ -4,6 +4,7 @@ const pluginStealth = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(pluginStealth());
 const siteLink = require("./project-objectives");
 const createCSV = require("csv-writer").createObjectCsvWriter;
+const fs = require('fs');
 
 let totalSrapes = 0;
 
@@ -555,10 +556,19 @@ async function scrapeProductPage(url) {
 
         // console.log("-------------------------header-----------------------");
         // console.log(header);
-        console.log("-------------------------mainHeader-----------------------");
-        console.log(mainHeader);
+        // console.log("-------------------------mainHeader-----------------------");
+        // console.log(mainHeader);
         // console.log("-------------------------mainSource-----------------------");
         // console.log(mainSource);
+        const obj = {header, mainHeader, mainSource}
+        
+        fs.writeFile("log.txt", JSON.stringify(obj), function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        
+            console.log("The file was saved!");
+        }); 
     }
 
     await scrape(url);
@@ -613,11 +623,10 @@ async function getJobsZipRecruiter(params) {
         
 
         await browser.close();
-        // console.log(zipRecruiterJobs);
-        // return zipRecruiterJobs;
+        
     } catch (err) {
         console.log(err);
     }
 }
 
-//getJobsZipRecruiter();
+
