@@ -127,6 +127,7 @@ async function scrapeProductPage(url) {
 
         let productName = '';
         try {
+            // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/h2
             const [el] = await page.$x(
                 '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/h2'
             );
@@ -137,16 +138,17 @@ async function scrapeProductPage(url) {
         }
 
         //cover picture
-        let coverPic ='';
+        let coverPic = '';
         try {
-	const [el2] = await page.$x(
-	            '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/img'
-	        );
-	        const src = await el2.getProperty("src");
-	        coverPic = await src.jsonValue();
-} catch (error) {
-	console.log('cant find coverPic');
-}
+            // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div/div[1]/div/img
+            const [el2] = await page.$x(
+                '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/img'
+            );
+            const src = await el2.getProperty("src");
+            coverPic = await src.jsonValue();
+        } catch (error) {
+            console.log('cant find coverPic');
+        }
 
         //returns all pictures
         // const images = await page.$$eval("img", (imgs) => {
@@ -168,7 +170,7 @@ async function scrapeProductPage(url) {
             );
             const srcel1 = await elPic1.getProperty("src");
             pic1 = await srcel1.jsonValue();
-        } catch (error) { }
+        } catch (error) { console.log('cant find pic1'); }
 
         let pic2 = "";
         try {
@@ -177,7 +179,7 @@ async function scrapeProductPage(url) {
             );
             const srcel2 = await elPic2.getProperty("src");
             pic2 = await srcel2.jsonValue();
-        } catch (error) { }
+        } catch (error) { console.log('cant find pic2'); }
 
         let pic3 = "";
         try {
@@ -186,7 +188,7 @@ async function scrapeProductPage(url) {
             );
             const srcel3 = await elPic3.getProperty("src");
             pic3 = await srcel3.jsonValue();
-        } catch (error) { }
+        } catch (error) { console.log('cant find pic3'); }
 
         let pic4 = "";
         try {
@@ -195,9 +197,10 @@ async function scrapeProductPage(url) {
             );
             const srcel4 = await elPic4.getProperty("src");
             pic4 = await srcel4.jsonValue();
-        } catch (error) { }
+        } catch (error) { console.log('cant find pic4'); }
 
         let brand = '';
+        // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/p/a
         try {
             const [elbrand] = await page.$x(
                 '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/p'
@@ -211,13 +214,26 @@ async function scrapeProductPage(url) {
         let productNumber = '';
         try {
             //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[2]  returs gap beatween strings
+            // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/span/div/p/text()[1] NRF
+            // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/span/div/p/text()[2] Number
             const [elProductNumber] = await page.$x(
                 '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[3]'
             );
             const prodNr = await elProductNumber.getProperty("textContent");
             productNumber = await prodNr.jsonValue();
         } catch (error) {
-            console.log('cant find productNumber');
+            console.log('cant find productNumber, trying loged in version path');
+
+            try {
+                const [elProductNumber] = await page.$x(
+                    '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/span/div/p/text()[3]'
+                );
+                const prodNr = await elProductNumber.getProperty("textContent");
+                productNumber = await prodNr.jsonValue();
+            } catch (error) {
+                console.log('stil cant find productNumber, check xpath');
+            }
+
         }
 
         let ShortDescription = "";
@@ -229,7 +245,7 @@ async function scrapeProductPage(url) {
                 "textContent"
             );
             ShortDescription = await textShortDescription.jsonValue();
-        } catch (error) { }
+        } catch (error) { console.log('cant find ShortDescription'); }
 
         let saleQuatity = "";
         try {
@@ -349,33 +365,33 @@ async function scrapeProductPage(url) {
 
         let collumnName4 = '';
         try {
-	const [elCollumnName4] = await page.$x(
-	            '//*[@id="documents-header"]/div[1]/h2'
-	        );
-	        const textelCollumnName4 = await elCollumnName4.getProperty("textContent");
-	        collumnName4 = await textelCollumnName4.jsonValue();
-} catch (error) {
-	console.log("cant find collumnName4 (documentation)", error);
-}
+            const [elCollumnName4] = await page.$x(
+                '//*[@id="documents-header"]/div[1]/h2'
+            );
+            const textelCollumnName4 = await elCollumnName4.getProperty("textContent");
+            collumnName4 = await textelCollumnName4.jsonValue();
+        } catch (error) {
+            console.log("cant find collumnName4 (documentation)", error);
+        }
 
         let documentstextContent = '';
         try {
-	const [el3] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
-	        const textContentel3 = await el3.getProperty("textContent");
-	        documentstextContent = await textContentel3.jsonValue();
-	
-} catch (error) {
-	console.log("cant find documentstextContent (documentation)", error);
-}
+            const [el3] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
+            const textContentel3 = await el3.getProperty("textContent");
+            documentstextContent = await textContentel3.jsonValue();
 
-        let documentsLink ='';
+        } catch (error) {
+            console.log("cant find documentstextContent (documentation)", error);
+        }
+
+        let documentsLink = '';
         try {
-	const [el4] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
-	        const href = await el4.getProperty("href");
-	        documentsLink = await href.jsonValue();
-} catch (error) {
-	console.log("cant find documentsLink (documentation)", error);
-}
+            const [el4] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
+            const href = await el4.getProperty("href");
+            documentsLink = await href.jsonValue();
+        } catch (error) {
+            console.log("cant find documentsLink (documentation)", error);
+        }
 
         let collumnNameVariations = "";
         const variations = [];
