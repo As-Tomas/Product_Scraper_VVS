@@ -5,28 +5,30 @@ puppeteer.use(pluginStealth());
 const siteLink = require("./project-objectives");
 const createCSV = require("csv-writer").createObjectCsvWriter;
 const fs = require('fs');
+const jsonfile = require('jsonfile')
+const cookies = require('./tmp/cookies.json')
 
 let totalSrapes = 0;
 
 let mainHeader = [
     { id: "category1", title: "CATEGORY 1" },
-{ id: "category2", title: "CATEGORY 2" },
-{ id: "category3", title: "CATEGORY 3" },
-{ id: "category4", title: "CATEGORY 4" },
-{ id: "productName", title: "PRODUC NAME" },
-{ id: "coverPic", title: "COVER PICTURE" },
-{ id: "pic1", title: "pic1"},
-{ id: "pic2", title: "pic2"},
-{ id: "pic3", title: "pic3"},
-{ id: "pic4", title: "pic4"},
-{ id: "brand", title: "brand"},
-{ id: "productNumber", title: "productNumber"},
-{ id: "ShortDescription", title: "ShortDescription"},
-{ id: "saleQuatity", title: "saleQuatity"},
-{ id: "price", title: "price"},
-{ id: "collumnName", title: "collumnName"},
-{ id: "description", title: "description"},
-{ id: "collumnName2", title: "collumnName2"},
+    { id: "category2", title: "CATEGORY 2" },
+    { id: "category3", title: "CATEGORY 3" },
+    { id: "category4", title: "CATEGORY 4" },
+    { id: "productName", title: "PRODUC NAME" },
+    { id: "coverPic", title: "COVER PICTURE" },
+    { id: "pic1", title: "pic1" },
+    { id: "pic2", title: "pic2" },
+    { id: "pic3", title: "pic3" },
+    { id: "pic4", title: "pic4" },
+    { id: "brand", title: "brand" },
+    { id: "productNumber", title: "productNumber" },
+    { id: "ShortDescription", title: "ShortDescription" },
+    { id: "saleQuatity", title: "saleQuatity" },
+    { id: "price", title: "price" },
+    { id: "collumnName", title: "collumnName" },
+    { id: "description", title: "description" },
+    { id: "collumnName2", title: "collumnName2" },
 ];
 
 let mainSource = [];
@@ -40,8 +42,24 @@ async function scrapeProductPage(url) {
     );
     await page.setViewport({ width: 1030, height: 768 });
 
+    // If file exist load the cookies
+    const file = './tmp/cookies.json'
+    const fileExists = jsonfile.readFileSync(file);
+    if (fileExists) {
+        const cookiesArr = cookies;
+        if (cookiesArr.length !== 0) {
+            await page.setCookie(...cookies);
+            // const cookiesSet = await page.cookies(url);
+            // console.log(JSON.stringify(cookiesSet));
+
+            console.log('Session has been loaded in the browser!')
+            //return true;
+        }
+    }
+
     const variantsUrls = [];
     let scrapeOneLevelDeep = true;
+
 
     // // (B) CREATE NEW CSV DOCUMENT
     // const csv = createCSV({
@@ -57,58 +75,66 @@ async function scrapeProductPage(url) {
     // });
 
     async function scrape(productUrl) {
+
+
+
         await page.goto(productUrl, { waitUntil: "networkidle2" });
         await page.waitForTimeout(1000);
 
-        let category1 ='';
+        let category1 = '';
         try {
             const [el01] = await page.$x(
                 '//*[@id="content-container"]/main/div[1]/ul/li[1]/a'
             );
             const textel01 = await el01.getProperty("textContent");
-            category1 = await textel01.jsonValue();            
+            category1 = await textel01.jsonValue();
         } catch (error) {
-            console.log('cant find categori 1')       
+            console.log('cant find categori 1')
         }
 
-        let category2 ='';
+        let category2 = '';
         try {
             const [el02] = await page.$x(
                 '//*[@id="content-container"]/main/div[1]/ul/li[2]/a'
             );
             const textel02 = await el02.getProperty("textContent");
-            category2 = await textel02.jsonValue();            
-        } catch (error) {   
-            console.log('cant find categori 2')            
+            category2 = await textel02.jsonValue();
+        } catch (error) {
+            console.log('cant find categori 2')
         }
 
-        let category3 ='';
+        let category3 = '';
         try {
             const [el03] = await page.$x(
                 '//*[@id="content-container"]/main/div[1]/ul/li[3]/a'
             );
             const textel03 = await el03.getProperty("textContent");
-            category3 = await textel03.jsonValue();            
-        } catch (error) {            
-            console.log('cant find categori 3')   
+            category3 = await textel03.jsonValue();
+        } catch (error) {
+            console.log('cant find categori 3')
         }
 
-        let category4 ='';
+        let category4 = '';
         try {
             const [el04] = await page.$x(
                 '//*[@id="content-container"]/main/div[1]/ul/li[4]/a'
             );
             const textel04 = await el04.getProperty("textContent");
-            category4 = await textel04.jsonValue();            
-        } catch (error) {            
-            console.log('cant find categori 4')   
+            category4 = await textel04.jsonValue();
+        } catch (error) {
+            console.log('cant find categori 4')
         }
 
-        const [el] = await page.$x(
-            '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/h2'
-        );
-        const text = await el.getProperty("textContent");
-        const productName = await text.jsonValue();
+        let productName = '';
+        try {
+            const [el] = await page.$x(
+                '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/h2'
+            );
+            const text = await el.getProperty("textContent");
+            productName = await text.jsonValue();
+        } catch (error) {
+            console.log('cant find productName')
+        }
 
         //cover picture
         const [el2] = await page.$x(
@@ -248,7 +274,7 @@ async function scrapeProductPage(url) {
 
                 // specifications[title] = title;
                 // specifications[value] = newValue;
-                specifications.push({ title:title, value: newValue });
+                specifications.push({ title: title, value: newValue });
             } catch (error) {
                 console.log("error", error);
             }
@@ -280,7 +306,7 @@ async function scrapeProductPage(url) {
 
                 let newValue = value.replace(title, "");
 
-                etim.push({ title:title, value: newValue });
+                etim.push({ title: title, value: newValue });
             } catch (error) {
                 console.log("error", error);
             }
@@ -382,48 +408,49 @@ async function scrapeProductPage(url) {
         //     variations,
         // });
 
-// working with data------------------------------------------------ ↓↓↓
+        // working with data------------------------------------------------ ↓↓↓
 
         // bulding CSV Writer data sets
-        let header= [
+        let header = [
             { id: "category1", title: "CATEGORY 1" },
             { id: "category2", title: "CATEGORY 2" },
             { id: "category3", title: "CATEGORY 3" },
             { id: "category4", title: "CATEGORY 4" },
             { id: "productName", title: "PRODUC NAME" },
             { id: "coverPic", title: "COVER PICTURE" },
-            { id: "pic1", title: "pic1"},
-            { id: "pic2", title: "pic2"},
-            { id: "pic3", title: "pic3"},
-            { id: "pic4", title: "pic4"},
-            { id: "brand", title: "brand"},
-            { id: "productNumber", title: "productNumber"},
-            { id: "ShortDescription", title: "ShortDescription"},
-            { id: "saleQuatity", title: "saleQuatity"},
-            { id: "price", title: "price"},
-            { id: "collumnName", title: "collumnName"},
-            { id: "description", title: "description"},
-            { id: "collumnName2", title: "collumnName2"},
+            { id: "pic1", title: "pic1" },
+            { id: "pic2", title: "pic2" },
+            { id: "pic3", title: "pic3" },
+            { id: "pic4", title: "pic4" },
+            { id: "brand", title: "brand" },
+            { id: "productNumber", title: "productNumber" },
+            { id: "ShortDescription", title: "ShortDescription" },
+            { id: "saleQuatity", title: "saleQuatity" },
+            { id: "price", title: "price" },
+            { id: "collumnName", title: "collumnName" },
+            { id: "description", title: "description" },
+            { id: "collumnName2", title: "collumnName2" },
         ]
 
-        
+
 
         //console.log("LOGING HEADER: -----------", header);
 
-        const source = 
-            { category1: category1, category2: category2, category3: category3, category4: category4, 
-                productName: productName, coverPic: coverPic, pic1: pic1, pic2: pic2, pic3: pic3, pic4: pic4, 
-                brand: brand, productNumber: productNumber, ShortDescription: ShortDescription, saleQuatity: saleQuatity,
-                price: price, collumnName: collumnName, description: description, collumnName2: collumnName2, 
-             };
+        const source =
+        {
+            category1: category1, category2: category2, category3: category3, category4: category4,
+            productName: productName, coverPic: coverPic, pic1: pic1, pic2: pic2, pic3: pic3, pic4: pic4,
+            brand: brand, productNumber: productNumber, ShortDescription: ShortDescription, saleQuatity: saleQuatity,
+            price: price, collumnName: collumnName, description: description, collumnName2: collumnName2,
+        };
 
         //console.log("-------------------------source-----------------------");
         //console.log(source);
-    
-        
+
+
         // remove colon from titles and add to header
-    
-        
+
+
 
         for (const iterator of specifications) {
             let title = iterator.title;
@@ -432,42 +459,42 @@ async function scrapeProductPage(url) {
             header.push({ id: iterator.title, title: iterator.title });
             header.push({ id: 'spec ' + iterator.title, title: 'spec ' + iterator.title });
             source[iterator.title] = iterator.title;
-            source['spec ' + iterator.title ] = iterator.value;
+            source['spec ' + iterator.title] = iterator.value;
             //--add to maisSource
-            
+
             (function add(mainHeader, iterator) {
 
                 const found = mainHeader.some(el => el.id === iterator.title);
-                if (!found) console.log("NOT FOUND: ", iterator.title );
+                if (!found) console.log("NOT FOUND: ", iterator.title);
                 if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
                 if (!found) mainHeader.push({ id: 'spec ' + iterator.title, title: 'spec ' + iterator.title });
                 return mainHeader;
 
-              })(mainHeader, iterator);
+            })(mainHeader, iterator);
             //-- end of it
 
-            
+
         };
 
         (function add(header, item) {
 
             const found = header.some(el => el.id === item);
-            if (!found) console.log("NOT FOUND: ", item );
+            if (!found) console.log("NOT FOUND: ", item);
             if (!found) header.push({ id: item, title: item });
             if (!found) source['collumnName3'] = collumnName3;
             return header;
 
-          })(header, collumnName3);
+        })(header, collumnName3);
 
         //--add to maisSource
-            
+
         (function add(mainHeader, item) {
 
             const found = mainHeader.some(el => el.id === item);
-            if (!found) mainHeader.push({ id: item , title: item });
+            if (!found) mainHeader.push({ id: item, title: item });
             return mainHeader;
 
-          })(mainHeader, collumnName3);
+        })(mainHeader, collumnName3);
         //-- end of it
 
         for (const iterator of etim) {
@@ -476,60 +503,60 @@ async function scrapeProductPage(url) {
             iterator.title = newTitle;
             header.push({ id: iterator.title, title: iterator.title });
             header.push({ id: 'etim ' + iterator.title, title: 'etim ' + iterator.title });
-            source[iterator.title ] = iterator.title;
+            source[iterator.title] = iterator.title;
             source['etim ' + iterator.title] = iterator.value;
-    
+
             //--add to maisSource
-            
+
             (function add(mainHeader, iterator) {
 
                 const found = mainHeader.some(el => el.id === iterator.title);
-                if (!found) console.log("NOT FOUND: ", iterator.title );
+                if (!found) console.log("NOT FOUND: ", iterator.title);
                 if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
                 if (!found) mainHeader.push({ id: 'etim ' + iterator.title, title: 'etim ' + iterator.title });
                 return mainHeader;
 
-              })(mainHeader, iterator);
+            })(mainHeader, iterator);
             //-- end of it
-            
+
         };
 
         for (const iterator of variations) {
             header.push({ id: iterator.title, title: iterator.title });
             header.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
             source[iterator.title] = iterator.title;
-            source['variantion ' + iterator.title ] = iterator.variantionProductNumber;
+            source['variantion ' + iterator.title] = iterator.variantionProductNumber;
             //--add to maisSource
-            
+
             (function add(mainHeader, iterator) {
 
                 const found = mainHeader.some(el => el.id === iterator.title);
-                if (!found) console.log("NOT FOUND: ", iterator.title );
+                if (!found) console.log("NOT FOUND: ", iterator.title);
                 if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
                 if (!found) mainHeader.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
                 return mainHeader;
 
-              })(mainHeader, iterator);
+            })(mainHeader, iterator);
             //-- end of it
         };
 
         //--add to maisSource
-            
+
         (function add(mainHeader, item) {
 
             const found = mainHeader.some(el => el.id === item);
-            if (!found) console.log("NOT FOUND: ", item );
+            if (!found) console.log("NOT FOUND: ", item);
             if (!found) mainHeader.push({ id: item, title: item });
             if (!found) header.push({ id: item, title: item });
             return mainHeader;
 
-          })(mainHeader, 'productUrl ');
+        })(mainHeader, 'productUrl ');
         //-- end of it
 
-        source['productUrl ' ] = productUrl;
+        source['productUrl '] = productUrl;
 
         mainSource.push(source);
-        
+
         // //  CREATE NEW CSV DOCUMENT
         // const csv = createCSV({
         //     path: `${productName}.csv`,
@@ -539,7 +566,7 @@ async function scrapeProductPage(url) {
         // //  WRITE DATA ROWS
         // await csv.writeRecords([
         //     source
-                
+
         //     ])
         //     .then(() => {
         //         console.log("Done!");
@@ -576,15 +603,15 @@ async function scrapeProductPage(url) {
         // console.log(mainHeader);
         // console.log("-------------------------mainSource-----------------------");
         // console.log(mainSource);
-        const obj = {header, mainHeader, mainSource}
-        
-        fs.writeFile("log.txt", JSON.stringify(obj), function(err) {
-            if(err) {
+        const obj = { header, mainHeader, mainSource }
+
+        fs.writeFile("log.txt", JSON.stringify(obj), function (err) {
+            if (err) {
                 return console.log(err);
             }
-        
+
             console.log("The file was saved!");
-        }); 
+        });
     }
 
     await scrape(url);
@@ -608,41 +635,17 @@ async function scrapeProductPage(url) {
     //  WRITE DATA ROWS
     await csv.writeRecords(
         mainSource
-            
-        )
+
+    )
         .then(() => {
             console.log("Done!");
         });
-        
+
     browser.close();
 }
 
 scrapeProductPage(siteLink.productLink);
 
-async function getJobsZipRecruiter(params) {
-    try {
-        const browser = await puppeteer.launch({ headless: false });
-        const [page] = await browser.pages();
-        await page.goto(siteLink.objectLink, { waitUntil: "networkidle2" });
-        //await page.waitForSelector('#createAlertPop');
 
-        urls = await page.evaluate(() =>
-            Array.from(
-                document.querySelectorAll(
-                    "#content-container > main > div > div > div > main > div > div > div > div > div > article > a"
-                ),
-                (link) => link.href
-            )
-        );
-
-        console.log(urls);
-        
-
-        await browser.close();
-        
-    } catch (err) {
-        console.log(err);
-    }
-}
 
 

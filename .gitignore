@@ -2,3 +2,5 @@ node_modules/
 project-objectives
 *.png
 *.log
+*.csv
+*.json
