@@ -311,7 +311,7 @@ async function scrapeProductPage(url) {
             );
             const textelsaleQuatity = await elsaleQuatity.getProperty("textContent");
             saleQuatity = await textelsaleQuatity.jsonValue();
-        } catch (error) { }
+        } catch (error) { console.log('cant find saleQuatity');}
 
         let price = "";
         try {
@@ -320,7 +320,18 @@ async function scrapeProductPage(url) {
             );
             const texteelprice = await elprice.getProperty("textContent");
             price = await texteelprice.jsonValue();
-        } catch (error) { }
+        } catch (error) {  console.log('cant find price');}
+        let newPrice = price.replace("kr ", "");
+
+        let nettStorage = '';
+        try {
+            const [elnettStorage] = await page.$x(
+                '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/div[2]/div/div/span'
+            );
+            const texteelnettStorage = await elnettStorage.getProperty("textContent");
+            nettStorage = await texteelnettStorage.jsonValue();
+        } catch (error) {  console.log('cant find nettStorage'); }
+        //let newnettStorage = nettStorage.replace("Nettlager ", "");
 
         let collumnName = '';
         try {
@@ -552,6 +563,7 @@ async function scrapeProductPage(url) {
             { id: "ShortDescription", title: "ShortDescription" },
             { id: "saleQuatity", title: "saleQuatity" },
             { id: "price", title: "price" },
+            { id: "nettStorage", title: "nettStorage" },
             { id: "collumnName", title: "collumnName" },
             { id: "description", title: "description" },
             { id: "collumnName2", title: "collumnName2" },
@@ -566,7 +578,7 @@ async function scrapeProductPage(url) {
             category1: category1, category2: category2, category3: category3, category4: category4,
             productName: productName, coverPic: coverPic, pic1: pic1, pic2: pic2, pic3: pic3, pic4: pic4,
             brand: brand, productNumber: productNumber, ShortDescription: ShortDescription, saleQuatity: saleQuatity,
-            price: price, collumnName: collumnName, description: description, collumnName2: collumnName2,
+            price: newPrice, nettStorage: nettStorage, collumnName: collumnName, description: description, collumnName2: collumnName2,
         };
 
         //console.log("-------------------------source-----------------------");
