@@ -63,19 +63,6 @@ async function scrapeProductPage(url) {
     let scrapeOneLevelDeep = true;
 
 
-    // // (B) CREATE NEW CSV DOCUMENT
-    // const csv = createCSV({
-    //     path: "scrapedProduct.csv",
-    //     header: [
-    //         { id: "productName", title: "PRODUC NAME" },
-    //         { id: "coverPic", title: "COVER PICTURE" },
-    //         { id: "pic1", title: "pic1"},
-    //         { id: "pic2", title: "pic2"},
-    //         { id: "pic3", title: "pic3"},
-    //         { id: "pic4", title: "pic4"}
-    //     ],
-    // });
-
     async function scrape(productUrl) {
 
 
@@ -548,6 +535,7 @@ async function scrapeProductPage(url) {
         // working with data------------------------------------------------ ↓↓↓
 
         // bulding CSV Writer data sets
+        // static header
         let header = [
             { id: "category1", title: "CATEGORY 1" },
             { id: "category2", title: "CATEGORY 2" },
@@ -738,6 +726,8 @@ async function scrapeProductPage(url) {
 
         const urlsVariants = await page.evaluate(() =>
             Array.from(
+                // using selector
+                // note returns just those what is in sale, out off sale not added
                 document.querySelectorAll(
                     "#content-container > main > div > div > div > div > article > a"
                 ),
