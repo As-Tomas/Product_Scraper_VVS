@@ -39,7 +39,7 @@ async function scrapeProductPage(url) {
 
     //await page.click('.button button-primary');
 
-    await page.waitForTimeout(15201);
+    await page.waitForTimeout(1201);
     // To Save the Session Cookies in puppeteer.
 
     const cookiesObject = await page.cookies()
