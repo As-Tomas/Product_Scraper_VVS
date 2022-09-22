@@ -163,6 +163,20 @@ async function scrapeProductPage(url) {
             coverPic = await src.jsonValue();
         } catch (error) {
             console.log('cant find coverPic', error);
+
+            try {    
+                xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/img'
+                if (logedIn) {
+                    xPath =
+                        '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div/img';
+                }
+    
+                const [el2] = await page.$x(xPath);
+                const src = await el2.getProperty("src");
+                coverPic = await src.jsonValue();
+            } catch (error) {
+                console.log('cant find coverPic 2 version xpath ', error);
+            }
         }
 
         //returns all pictures
@@ -193,6 +207,10 @@ async function scrapeProductPage(url) {
             const srcel1 = await elPic1.getProperty("src");
             pic1 = await srcel1.jsonValue();
         } catch (error) { console.log('cant find pic1'); }
+
+        if (pic1 === "") {
+            pic1 = coverPic;
+        }
 
         let pic2 = "";
         try {
@@ -452,22 +470,83 @@ async function scrapeProductPage(url) {
         }
 
         let documentstextContent = '';
-        try {
+        let documentstextContent1 = '';
+        let documentstextContent2 = '';
+        //*[@id="documents-content"]/div/div/div/a
+                                         //*[@id="documents-content"]/div/div/div[1]/a
+        try {                            //*[@id="documents-content"]/div/div/div[2]/a
+            
             const [el3] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
             const textContentel3 = await el3.getProperty("textContent");
             documentstextContent = await textContentel3.jsonValue();
 
         } catch (error) {
-            console.log("cant find documentstextContent (documentation)", error);
+            console.log("cant find documentstextContent (documentation) tring search in array    " , error);
+
+            try {                                        
+                const [el3a] = await page.$x('//*[@id="documents-content"]/div/div/div[1]/a');
+                const textContentel3a = await el3a.getProperty("textContent");
+                documentstextContent = await textContentel3a.jsonValue();
+    
+            } catch (error) {
+                console.log("cant find documentstextContent (documentation) ", error);
+            }
+
+            try {                                        
+                const [el3b] = await page.$x('//*[@id="documents-content"]/div/div/div[2]/a');
+                const textContentel3b = await el3b.getProperty("textContent ");
+                documentstextContent1 = await textContentel3b.jsonValue();
+    
+            } catch (error) {
+                console.log("cant find documentstextContent (documentation) ", error);
+            }
+
+            try {                                        
+                const [el3c] = await page.$x('//*[@id="documents-content"]/div/div/div[3]/a');
+                const textContentel3c = await el3c.getProperty("textContent");
+                documentstextContent2 = await textContentel3c.jsonValue();
+    
+            } catch (error) {
+                console.log("cant find documentstextContent (documentation) ", error);
+            }
         }
 
         let documentsLink = '';
+        let documentsLink1 = '';
+        let documentsLink2 = '';
         try {
             const [el4] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
             const href = await el4.getProperty("href");
             documentsLink = await href.jsonValue();
         } catch (error) {
-            console.log("cant find documentsLink (documentation)", error);
+            console.log("cant find documentsLink (documentation) tring search in array    ", error);
+
+            try {                                        
+                const [el4a] = await page.$x('//*[@id="documents-content"]/div/div/div[1]/a');
+                const textContentel4a = await el4a.getProperty("href");
+                documentsLink = await textContentel4a.jsonValue();
+    
+            } catch (error) {
+                console.log("cant find documentstextContent (documentation) ", error);
+            }
+
+            try {                                        
+                const [el4b] = await page.$x('//*[@id="documents-content"]/div/div/div[2]/a');
+                const textContentel4b = await el4b.getProperty("href");
+                documentsLink1 = await textContentel4b.jsonValue();
+    
+            } catch (error) {
+                console.log("cant find documentstextContent (documentation) ", error);
+            }
+
+            try {                                        
+                const [el4c] = await page.$x('//*[@id="documents-content"]/div/div/div[3]/a');
+                const textContentel4c = await el4c.getProperty("href");
+                documentsLink2 = await textContentel4c.jsonValue();
+    
+            } catch (error) {
+                console.log("cant find documentstextContent (documentation) ", error);
+            }
         }
 
         let collumnNameVariations = "";
@@ -702,7 +781,7 @@ async function scrapeProductPage(url) {
 
         //--add to mainHeader
 
-        (function add(mainHeader, item, item2, item3) {
+        (function add(mainHeader, item, item2, item3, item4, item5, item6, item7) {
 
             const found = mainHeader.some(el => el.id === item);
             if (!found) console.log("NOT FOUND: ", item);
@@ -716,9 +795,25 @@ async function scrapeProductPage(url) {
             const found3 = mainHeader.some(el => el.id === item3);
             if (!found3) mainHeader.push({ id: item3, title: item3 });
             if (!found3) header.push({ id: item3, title: item3 });
+
+            const found4 = mainHeader.some(el => el.id === item4);
+            if (!found4) mainHeader.push({ id: item4, title: item4 });
+            if (!found4) header.push({ id: item4, title: item4 });
+
+            const found5 = mainHeader.some(el => el.id === item5);
+            if (!found5) mainHeader.push({ id: item5, title: item5 });
+            if (!found5) header.push({ id: item5, title: item5 });
+
+            const found6 = mainHeader.some(el => el.id === item6);
+            if (!found6) mainHeader.push({ id: item6, title: item6 });
+            if (!found6) header.push({ id: item6, title: item6 });
+
+            const found7 = mainHeader.some(el => el.id === item7);
+            if (!found7) mainHeader.push({ id: item7, title: item7 });
+            if (!found7) header.push({ id: item7, title: item7 });
             return mainHeader;
 
-        })(mainHeader, 'collumnName4', 'documentstextContent', 'documentsLink');
+        })(mainHeader, 'collumnName4', 'documentstextContent', 'documentsLink', 'documentstextContent1', 'documentsLink1', 'documentstextContent2', 'documentsLink2');
         //-- end of it
 
         // todo add remove those aditions to header its unused at all...
@@ -726,6 +821,10 @@ async function scrapeProductPage(url) {
         source['collumnName4'] = collumnName4;
         source['documentstextContent'] = documentstextContent;
         source['documentsLink'] = documentsLink;
+        source['documentstextContent'] = documentstextContent1;
+        source['documentsLink'] = documentsLink1;
+        source['documentstextContent'] = documentstextContent2;
+        source['documentsLink'] = documentsLink2;
 
         mainSource.push(source);
 
@@ -800,7 +899,8 @@ async function scrapeProductPage(url) {
 
 
     //  CREATE NEW CSV DOCUMENT
-    const newfirstProductName = firstProductName.replace("/", "-");
+    const newfirstProductName = firstProductName.replace(/['"/]+/g, '');
+    
     const csv = createCSV({
         path: `${newfirstProductName}.csv`,
         // path: 'results.csv',
@@ -816,17 +916,17 @@ async function scrapeProductPage(url) {
             console.log("Done!");
         });
 
-    browser.close();
+    //browser.close();
 }
 
 // for single link
-// scrapeProductPage(siteLink.productLink);
+scrapeProductPage(siteLink.productLink);
 
 // for array of links
-for (const url of siteLink.productsArray) {
-    scrapeProductPage(url);
+// for (const url of siteLink.productsArray) {
+//     scrapeProductPage(url);
 
-}
+// }
 
 
 
