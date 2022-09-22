@@ -10,28 +10,6 @@ const cookies = require('./tmp/cookies.json')
 
 let totalSrapes = 0;
 
-let mainHeader = [
-    { id: "category1", title: "CATEGORY 1" },
-    { id: "category2", title: "CATEGORY 2" },
-    { id: "category3", title: "CATEGORY 3" },
-    { id: "category4", title: "CATEGORY 4" },
-    { id: "productName", title: "PRODUC NAME" },
-    { id: "coverPic", title: "COVER PICTURE" },
-    { id: "pic1", title: "pic1" },
-    { id: "pic2", title: "pic2" },
-    { id: "pic3", title: "pic3" },
-    { id: "pic4", title: "pic4" },
-    { id: "brand", title: "brand" },
-    { id: "productNumber", title: "productNumber" },
-    { id: "ShortDescription", title: "ShortDescription" },
-    { id: "saleQuatity", title: "saleQuatity" },
-    { id: "price", title: "price" },
-    { id: "collumnName", title: "collumnName" },
-    { id: "description", title: "description" },
-    { id: "collumnName2", title: "collumnName2" },
-];
-
-let mainSource = [];
 
 
 async function scrapeProductPage(url) {
@@ -58,6 +36,32 @@ async function scrapeProductPage(url) {
             //return true;
         }
     }
+    let firstProductName = 'results';
+    let setFileName = true;
+
+    let mainHeader = [
+        { id: "category1", title: "CATEGORY 1" },
+        { id: "category2", title: "CATEGORY 2" },
+        { id: "category3", title: "CATEGORY 3" },
+        { id: "category4", title: "CATEGORY 4" },
+        { id: "productName", title: "PRODUC NAME" },
+        { id: "coverPic", title: "COVER PICTURE" },
+        { id: "pic1", title: "pic1" },
+        { id: "pic2", title: "pic2" },
+        { id: "pic3", title: "pic3" },
+        { id: "pic4", title: "pic4" },
+        { id: "brand", title: "brand" },
+        { id: "productNumber", title: "productNumber" },
+        { id: "ShortDescription", title: "ShortDescription" },
+        { id: "saleQuatity", title: "saleQuatity" },
+        { id: "price", title: "price" },
+        { id: "nettStorage", title: "nettStorage" },
+        { id: "collumnName", title: "collumnName" },
+        { id: "description", title: "description" },
+        { id: "collumnName2", title: "collumnName2" },
+    ];
+
+    let mainSource = [];
 
     const variantsUrls = [];
     let scrapeOneLevelDeep = true;
@@ -118,14 +122,14 @@ async function scrapeProductPage(url) {
             console.log('cant find categori 4');
         }
 
-        let xPath =''
+        let xPath = ''
         let productName = '';
         try {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/h2
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/h2
 
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/h2'
-            if (logedIn){
+            if (logedIn) {
                 xPath =
                     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/h2';
             }
@@ -137,14 +141,19 @@ async function scrapeProductPage(url) {
             console.log('cant find productName', error);
         }
 
+        if (setFileName && productName !== '') {
+            firstProductName = productName;
+            setFileName = false;
+        }
+
         //cover picture
         let coverPic = '';
-        try {                   
+        try {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/img
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div/div[1]/div/img
-            
+
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/img'
-            if (logedIn){
+            if (logedIn) {
                 xPath =
                     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div/div[1]/div/img';
             }
@@ -173,9 +182,9 @@ async function scrapeProductPage(url) {
         try {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[2]/div/div/button[1]/div/img
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div/button[1]/div/img
-            
+
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[2]/div/div/button[1]/div/img'
-            if (logedIn){
+            if (logedIn) {
                 xPath =
                     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div/button[1]/div/img';
             }
@@ -190,7 +199,7 @@ async function scrapeProductPage(url) {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[2]/div/div/button[2]/div/img
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div/button[2]/div/img
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[2]/div/div/button[2]/div/img'
-            if (logedIn){
+            if (logedIn) {
                 xPath =
                     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div/button[2]/div/img';
             }
@@ -205,7 +214,7 @@ async function scrapeProductPage(url) {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[2]/div/div/button[3]/div/img
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div/button[3]/div/img
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[2]/div/div/button[3]/div/img'
-            if (logedIn){
+            if (logedIn) {
                 xPath =
                     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div/button[3]/div/img';
             }
@@ -220,7 +229,7 @@ async function scrapeProductPage(url) {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[2]/div/div/button[4]/div/img
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div/button[4]/div/img
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[2]/div/div/button[4]/div/img'
-            if (logedIn){
+            if (logedIn) {
                 xPath =
                     ' //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div/button[4]/div/img';
             }
@@ -235,7 +244,7 @@ async function scrapeProductPage(url) {
         // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/p/a
         try {
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/p'
-            if (logedIn){
+            if (logedIn) {
                 xPath =
                     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/p/a';
             }
@@ -254,13 +263,13 @@ async function scrapeProductPage(url) {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[3] Number
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/span/div/p/text()[2] Number
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[3]'
-            if (logedIn){
+            if (logedIn) {
                 xPath =
                     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/span/div/p/text()[3]';
             }
 
-            const [elProductNumber] = await page.$x(xPath);                    
-            
+            const [elProductNumber] = await page.$x(xPath);
+
             const prodNr = await elProductNumber.getProperty("textContent");
             productNumber = await prodNr.jsonValue();
         } catch (error) {
@@ -288,17 +297,17 @@ async function scrapeProductPage(url) {
         }
 
         let ShortDescription = "";
-        try {                   
+        try {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/p/text()
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/p/text()
-                     
+
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/p/text()'
-            if (logedIn){
+            if (logedIn) {
                 xPath =
                     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/p/text()';
             }
 
-            const [elShortDescription] = await page.$x(xPath);  
+            const [elShortDescription] = await page.$x(xPath);
             const textShortDescription = await elShortDescription.getProperty("textContent");
             ShortDescription = await textShortDescription.jsonValue();
 
@@ -311,7 +320,7 @@ async function scrapeProductPage(url) {
             );
             const textelsaleQuatity = await elsaleQuatity.getProperty("textContent");
             saleQuatity = await textelsaleQuatity.jsonValue();
-        } catch (error) { console.log('cant find saleQuatity');}
+        } catch (error) { console.log('cant find saleQuatity'); }
 
         let price = "";
         try {
@@ -320,7 +329,7 @@ async function scrapeProductPage(url) {
             );
             const texteelprice = await elprice.getProperty("textContent");
             price = await texteelprice.jsonValue();
-        } catch (error) {  console.log('cant find price');}
+        } catch (error) { console.log('cant find price'); }
         let newPrice = price.replace("kr ", "");
 
         let nettStorage = '';
@@ -330,7 +339,7 @@ async function scrapeProductPage(url) {
             );
             const texteelnettStorage = await elnettStorage.getProperty("textContent");
             nettStorage = await texteelnettStorage.jsonValue();
-        } catch (error) {  console.log('cant find nettStorage'); }
+        } catch (error) { console.log('cant find nettStorage'); }
         //let newnettStorage = nettStorage.replace("Nettlager ", "");
 
         let collumnName = '';
@@ -791,9 +800,10 @@ async function scrapeProductPage(url) {
 
 
     //  CREATE NEW CSV DOCUMENT
+    const newfirstProductName = firstProductName.replace("/", "-");
     const csv = createCSV({
-        // path: `${productName}.csv`,
-        path: 'results.csv',
+        path: `${newfirstProductName}.csv`,
+        // path: 'results.csv',
         header: mainHeader
     });
 
@@ -806,10 +816,17 @@ async function scrapeProductPage(url) {
             console.log("Done!");
         });
 
-    //browser.close();
+    browser.close();
 }
 
-scrapeProductPage(siteLink.productLink);
+// for single link
+// scrapeProductPage(siteLink.productLink);
+
+// for array of links
+for (const url of siteLink.productsArray) {
+    scrapeProductPage(url);
+
+}
 
 
 
