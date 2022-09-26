@@ -732,9 +732,9 @@ async function scrapeProductPage(url) {
             let newTitle = title.replace(": ", "");
             iterator.title = newTitle;
             header.push({ id: iterator.title, title: iterator.title });
-            header.push({ id: 'spec ' + iterator.title, title: 'spec ' + iterator.title });
+            header.push({ id: 'spec- ' + iterator.title, title: 'spec- ' + iterator.title });
             source[iterator.title] = iterator.title;
-            source['spec ' + iterator.title] = iterator.value;
+            source['spec- ' + iterator.title] = iterator.value;
             //--add to mainHeader
 
             (function add(mainHeader, iterator) {
@@ -742,7 +742,7 @@ async function scrapeProductPage(url) {
                 const found = mainHeader.some(el => el.id === iterator.title);
                 // if (!found) console.log("NOT FOUND: ", iterator.title);
                 if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
-                if (!found) mainHeader.push({ id: 'spec ' + iterator.title, title: 'spec ' + iterator.title });
+                if (!found) mainHeader.push({ id: 'spec- ' + iterator.title, title: 'spec- ' + iterator.title });
                 return mainHeader;
 
             })(mainHeader, iterator);
@@ -777,9 +777,9 @@ async function scrapeProductPage(url) {
             let newTitle = title.replace(": ", "");
             iterator.title = newTitle;
             header.push({ id: iterator.title, title: iterator.title });
-            header.push({ id: 'etim ' + iterator.title, title: 'etim ' + iterator.title });
+            header.push({ id: 'etim- ' + iterator.title, title: 'etim- ' + iterator.title });
             source[iterator.title] = iterator.title;
-            source['etim ' + iterator.title] = iterator.value;
+            source['etim- ' + iterator.title] = iterator.value;
 
             //--add to mainHeader
 
@@ -788,7 +788,7 @@ async function scrapeProductPage(url) {
                 const found = mainHeader.some(el => el.id === iterator.title);
                 // if (!found) console.log("NOT FOUND: ", iterator.title);
                 if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
-                if (!found) mainHeader.push({ id: 'etim ' + iterator.title, title: 'etim ' + iterator.title });
+                if (!found) mainHeader.push({ id: 'etim- ' + iterator.title, title: 'etim- ' + iterator.title });
                 return mainHeader;
 
             })(mainHeader, iterator);
@@ -796,25 +796,35 @@ async function scrapeProductPage(url) {
 
         };
 
-        console.log("WWWWWWWWWWWWWWWAS ", variations)
-        for (const iterator of variations) {
-            header.push({ id: iterator.title, title: iterator.title });
-            header.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
-            source[iterator.title] = iterator.title;
-            source['variantion ' + iterator.title] = iterator.variantionProductNumber;
-            //--add to mainHeader
+        
+        // for (const iterator of variations) {
+        //     header.push({ id: iterator.title, title: iterator.title });
+        //     header.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
+        //     source[iterator.title] = iterator.title;
+        //     source['variantion ' + iterator.title] = iterator.variantionProductNumber;
+        //     //--add to mainHeader
 
-            (function add(mainHeader, iterator) {
+        //     (function add(mainHeader, iterator) {
 
-                const found = mainHeader.some(el => el.id === iterator.title);
-                // if (!found) console.log("NOT FOUND: ", iterator.title);
-                if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
-                if (!found) mainHeader.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
-                return mainHeader;
+        //         const found = mainHeader.some(el => el.id === iterator.title);
+        //         // if (!found) console.log("NOT FOUND: ", iterator.title);
+        //         if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
+        //         if (!found) mainHeader.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
+        //         return mainHeader;
 
-            })(mainHeader, iterator);
-            //-- end of it
-        };
+        //     })(mainHeader, iterator);
+        //     //-- end of it
+        // };
+
+        const variationsGroup = []
+        for (const prodNr of variations){
+            variationsGroup.push(prodNr.variantionProductNumber);
+        }
+
+        const found = mainHeader.some(el => el.id === 'variations');
+        // if (!found) console.log("NOT FOUND: ", iterator.title);
+        if (!found) mainHeader.push({ id: 'variations', title: 'VARIATIONS' });
+        source['variations'] = variationsGroup;
 
         //--add to mainHeader
 
@@ -904,10 +914,10 @@ async function scrapeProductPage(url) {
         }
 
         if (setFileName && category1 !== '') {
-            fileName = category1 + category2;
+            fileName = category1 +" "+ category2;
             setFileName = false;
         } 
-        
+
         totalSrapes++;
         console.log("totatl scrapes: ", totalSrapes);
 
@@ -930,27 +940,30 @@ async function scrapeProductPage(url) {
     }
 
     // for single link
-    await scrape(url);
-    //scrape variantions
-    if (!scrapeOneLevelDeep) {
-        for (const varUrl of variantsUrls) {
-            await scrape(varUrl);
-        }
-        scrapeOneLevelDeep = true;
-    }
 
+    // await scrape(url);
+    // //scrape variantions
+    // if (!scrapeOneLevelDeep) {
+    //     for (const varUrl of variantsUrls) {
+    //         await scrape(varUrl);
+    //     }
+    //     scrapeOneLevelDeep = true;
+    // }
+
+    
     // for array of links
-//     for (const url of siteLink.productsArray) {
-//         await scrape(url);
+
+    for (const url of siteLink.productsArray) {
+        await scrape(url);
    
-//         //scrape variantions
-//         if (!scrapeOneLevelDeep) {
-//             for (const varUrl of variantsUrls) {
-//                 await scrape(varUrl);
-//             }
-//             scrapeOneLevelDeep = true;
-//         }
-//    }
+        //scrape variantions
+        if (!scrapeOneLevelDeep) {
+            for (const varUrl of variantsUrls) {
+                await scrape(varUrl);
+            }
+            scrapeOneLevelDeep = true;
+        }
+   }
 
 
 
@@ -976,10 +989,10 @@ async function scrapeProductPage(url) {
 }
 
 // for single link
- scrapeProductPage(siteLink.productLink);
+//  scrapeProductPage(siteLink.productLink);
 
 // for array of links
-//scrapeProductPage(siteLink.productsArray);
+scrapeProductPage(siteLink.productsArray);
 
 
 
