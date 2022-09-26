@@ -36,7 +36,7 @@ async function scrapeProductPage(url) {
             //return true;
         }
     }
-    let firstProductName = 'results';
+    let fileName = 'results';
     let setFileName = true;
 
     let mainHeader = [
@@ -72,6 +72,7 @@ async function scrapeProductPage(url) {
 
 
         await page.goto(productUrl, { waitUntil: "networkidle2" });
+        // await page.waitForNavigation({ waitUntil: 'networkidle0' });
         await page.waitForTimeout(1000);
 
         //todo check is it login needed 
@@ -122,6 +123,13 @@ async function scrapeProductPage(url) {
             console.log('cant find categori 4');
         }
 
+        if (setFileName && category1 !== '') {
+            fileName = category1 + category2;
+            setFileName = false;
+        } else {
+            fileName = 'results';
+        }
+
         let xPath = ''
         let productName = '';
         try {
@@ -141,9 +149,8 @@ async function scrapeProductPage(url) {
             console.log('cant find productName', error);
         }
 
-        if (setFileName && productName !== '') {
-            firstProductName = productName;
-            setFileName = false;
+        if(productName !== ''){
+            console.log('productName ', productName)
         }
 
         //cover picture
@@ -151,6 +158,8 @@ async function scrapeProductPage(url) {
         try {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/img
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div/div[1]/div/img
+                                //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div/img
+                                
 
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/img'
             if (logedIn) {
@@ -162,7 +171,7 @@ async function scrapeProductPage(url) {
             const src = await el2.getProperty("src");
             coverPic = await src.jsonValue();
         } catch (error) {
-            console.log('cant find coverPic', error);
+            console.log('cant find coverPic try other xpath', error);
 
             try {    
                 xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/img'
@@ -176,6 +185,20 @@ async function scrapeProductPage(url) {
                 coverPic = await src.jsonValue();
             } catch (error) {
                 console.log('cant find coverPic 2 version xpath ', error);
+
+                try {    
+                    xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div/img'
+                    if (logedIn) {
+                        xPath =
+                            '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/div/div/img';
+                    }
+        
+                    const [el2] = await page.$x(xPath);
+                    const src = await el2.getProperty("src");
+                    coverPic = await src.jsonValue();
+                } catch (error) {
+                    console.log('cant find coverPic 3 version xpath GIVING UP!!!', error);
+                }
             }
         }
 
@@ -383,7 +406,7 @@ async function scrapeProductPage(url) {
         }
 
         //specifications
-        let collumnName2 = [];
+        let collumnName2 = '';
         try {
             const [elCollumnName2] = await page.$x(
                 '//*[@id="specifications-header"]/div[1]/h2'
@@ -417,7 +440,7 @@ async function scrapeProductPage(url) {
                 // specifications[value] = newValue;
                 specifications.push({ title: title, value: newValue });
             } catch (error) {
-                console.log("error", error);
+                console.log("Cant get specifications array", error);
             }
         }
 
@@ -887,22 +910,36 @@ async function scrapeProductPage(url) {
         });
     }
 
-    await scrape(url);
+    // for single link
+    // await scrape(url);
+    // //scrape variantions
+    // if (!scrapeOneLevelDeep) {
+    //     for (const varUrl of variantsUrls) {
+    //         await scrape(varUrl);
+    //     }
+    //     scrapeOneLevelDeep = true;
+    // }
 
-    //scrape variantions
-    if (!scrapeOneLevelDeep) {
-        for (const varUrl of variantsUrls) {
-            await scrape(varUrl);
+    // for array of links
+    for (const url of siteLink.productsArray) {
+        await scrape(url);
+   
+        //scrape variantions
+        if (!scrapeOneLevelDeep) {
+            for (const varUrl of variantsUrls) {
+                await scrape(varUrl);
+            }
+            scrapeOneLevelDeep = true;
         }
-        scrapeOneLevelDeep = true;
-    }
+   }
+
 
 
     //  CREATE NEW CSV DOCUMENT
-    const newfirstProductName = firstProductName.replace(/['"/]+/g, '');
+    const newfileName = fileName.replace(/['"/]+/g, '');
     
     const csv = createCSV({
-        path: `${newfirstProductName}.csv`,
+        path: `${newfileName}.csv`,
         // path: 'results.csv',
         header: mainHeader
     });
@@ -920,13 +957,11 @@ async function scrapeProductPage(url) {
 }
 
 // for single link
-scrapeProductPage(siteLink.productLink);
+// scrapeProductPage(siteLink.productLink);
 
 // for array of links
-// for (const url of siteLink.productsArray) {
-//     scrapeProductPage(url);
+scrapeProductPage(siteLink.productsArray);
 
-// }
 
 
 
