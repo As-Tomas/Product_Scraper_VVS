@@ -171,7 +171,7 @@ async function scrapeProductPage(url) {
             const src = await el2.getProperty("src");
             coverPic = await src.jsonValue();
         } catch (error) {
-            console.log('cant find coverPic try other xpath', error);
+            console.log('cant find coverPic try other xpath');
 
             try {    
                 xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/img'
@@ -184,7 +184,7 @@ async function scrapeProductPage(url) {
                 const src = await el2.getProperty("src");
                 coverPic = await src.jsonValue();
             } catch (error) {
-                console.log('cant find coverPic 2 version xpath ', error);
+                console.log('cant find coverPic 2 version try other xpath ');
 
                 try {    
                     xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[1]/div/div/img'
