@@ -27,7 +27,6 @@ async function scrapeProductPage(url) {
     if (cookiesExists) {
         const cookiesArr = cookies;
         if (cookiesArr.length !== 0) {
-            logedIn = true;
             await page.setCookie(...cookies);
             // const cookiesSet = await page.cookies(url);
             // console.log(JSON.stringify(cookiesSet));
@@ -76,8 +75,28 @@ async function scrapeProductPage(url) {
         await page.waitForTimeout(1000);
 
         //todo check is it login needed 
+        //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/div/button/text()
         // button //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/div/button
         // text: Logg inn for å handle
+
+        let loginButton = '';
+        try {
+            const [el01] = await page.$x(
+                '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/div/button'
+            );
+            const textel01 = await el01.getProperty("textContent");
+            loginButton = await textel01.jsonValue();
+        } catch (error) {
+            // console.log('cant find login for a handle');
+        }
+
+        if(loginButton === 'Logg inn for å handle'){
+            console.log('Found Button to login');
+            logedIn = false;
+        } else {
+            logedIn = true;
+        }
+
 
         let category1 = '';
         try {
@@ -120,7 +139,7 @@ async function scrapeProductPage(url) {
             const textel04 = await el04.getProperty("textContent");
             category4 = await textel04.jsonValue();
         } catch (error) {
-            console.log('cant find categori 4');
+            //console.log('cant find categori 4');
         }
 
         let xPath = ''
@@ -128,6 +147,8 @@ async function scrapeProductPage(url) {
         try {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/h2
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/h2
+                                //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/h2
+                                //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/h2
 
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/h2'
             if (logedIn) {
@@ -271,7 +292,9 @@ async function scrapeProductPage(url) {
             const [elPic4] = await page.$x(xPath);
             const srcel4 = await elPic4.getProperty("src");
             pic4 = await srcel4.jsonValue();
-        } catch (error) { console.log('cant find pic4'); }
+        } catch (error) { 
+            //console.log('cant find pic4'); 
+        }
 
         let brand = '';
         // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/p
@@ -325,6 +348,16 @@ async function scrapeProductPage(url) {
                     productNumber = await prodNr.jsonValue();
                 } catch (error) {
                     console.log('stil cant find productNumber in 2, check xpath');
+
+                    try {
+                        const [elProductNumber] = await page.$x(
+                            '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/span/div/p/text()[1]'
+                        );
+                        const prodNr = await elProductNumber.getProperty("textContent");
+                        productNumber = await prodNr.jsonValue();
+                    } catch (error) {
+                        console.log('stil cant find productNumber in 1, giving up');
+                    }
                 }
             }
 
@@ -488,9 +521,10 @@ async function scrapeProductPage(url) {
         let documentstextContent = '';
         let documentstextContent1 = '';
         let documentstextContent2 = '';
-        //*[@id="documents-content"]/div/div/div/a
+                                         //*[@id="documents-content"]/div/div/div/a
                                          //*[@id="documents-content"]/div/div/div[1]/a
-        try {                            //*[@id="documents-content"]/div/div/div[2]/a
+                                         //*[@id="documents-content"]/div/div/div[2]/a
+        try {                            
             
             const [el3] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
             const textContentel3 = await el3.getProperty("textContent");
@@ -617,7 +651,7 @@ async function scrapeProductPage(url) {
                     console.log("error", error);
                 }
             }
-        } catch (error) { }
+        } catch (error) { console.log("error", error); }
         // console.log({
         //     category1,
         //     category2,
@@ -762,6 +796,7 @@ async function scrapeProductPage(url) {
 
         };
 
+        console.log("WWWWWWWWWWWWWWWAS ", variations)
         for (const iterator of variations) {
             header.push({ id: iterator.title, title: iterator.title });
             header.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
@@ -896,27 +931,27 @@ async function scrapeProductPage(url) {
     }
 
     // for single link
-    // await scrape(url);
-    // //scrape variantions
-    // if (!scrapeOneLevelDeep) {
-    //     for (const varUrl of variantsUrls) {
-    //         await scrape(varUrl);
-    //     }
-    //     scrapeOneLevelDeep = true;
-    // }
+    await scrape(url);
+    //scrape variantions
+    if (!scrapeOneLevelDeep) {
+        for (const varUrl of variantsUrls) {
+            await scrape(varUrl);
+        }
+        scrapeOneLevelDeep = true;
+    }
 
     // for array of links
-    for (const url of siteLink.productsArray) {
-        await scrape(url);
+//     for (const url of siteLink.productsArray) {
+//         await scrape(url);
    
-        //scrape variantions
-        if (!scrapeOneLevelDeep) {
-            for (const varUrl of variantsUrls) {
-                await scrape(varUrl);
-            }
-            scrapeOneLevelDeep = true;
-        }
-   }
+//         //scrape variantions
+//         if (!scrapeOneLevelDeep) {
+//             for (const varUrl of variantsUrls) {
+//                 await scrape(varUrl);
+//             }
+//             scrapeOneLevelDeep = true;
+//         }
+//    }
 
 
 
@@ -935,17 +970,17 @@ async function scrapeProductPage(url) {
 
     )
         .then(() => {
-            console.log("Done!");
+            console.log(`Done -> ${newfileName}.csv`);
         });
 
     //browser.close();
 }
 
 // for single link
-// scrapeProductPage(siteLink.productLink);
+ scrapeProductPage(siteLink.productLink);
 
 // for array of links
-scrapeProductPage(siteLink.productsArray);
+//scrapeProductPage(siteLink.productsArray);
 
 
 
