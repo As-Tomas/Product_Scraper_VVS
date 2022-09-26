@@ -906,9 +906,8 @@ async function scrapeProductPage(url) {
         if (setFileName && category1 !== '') {
             fileName = category1 + category2;
             setFileName = false;
-        } else {
-            fileName = 'results';
-        }
+        } 
+        
         totalSrapes++;
         console.log("totatl scrapes: ", totalSrapes);
 
