@@ -123,13 +123,6 @@ async function scrapeProductPage(url) {
             console.log('cant find categori 4');
         }
 
-        if (setFileName && category1 !== '') {
-            fileName = category1 + category2;
-            setFileName = false;
-        } else {
-            fileName = 'results';
-        }
-
         let xPath = ''
         let productName = '';
         try {
@@ -713,7 +706,7 @@ async function scrapeProductPage(url) {
             (function add(mainHeader, iterator) {
 
                 const found = mainHeader.some(el => el.id === iterator.title);
-                if (!found) console.log("NOT FOUND: ", iterator.title);
+                // if (!found) console.log("NOT FOUND: ", iterator.title);
                 if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
                 if (!found) mainHeader.push({ id: 'spec ' + iterator.title, title: 'spec ' + iterator.title });
                 return mainHeader;
@@ -727,7 +720,7 @@ async function scrapeProductPage(url) {
         (function add(header, item) {
 
             const found = header.some(el => el.id === item);
-            if (!found) console.log("NOT FOUND: ", item);
+            // if (!found) console.log("NOT FOUND: ", item);
             if (!found) header.push({ id: item, title: item });
             if (!found) source['collumnName3'] = collumnName3;
             return header;
@@ -759,7 +752,7 @@ async function scrapeProductPage(url) {
             (function add(mainHeader, iterator) {
 
                 const found = mainHeader.some(el => el.id === iterator.title);
-                if (!found) console.log("NOT FOUND: ", iterator.title);
+                // if (!found) console.log("NOT FOUND: ", iterator.title);
                 if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
                 if (!found) mainHeader.push({ id: 'etim ' + iterator.title, title: 'etim ' + iterator.title });
                 return mainHeader;
@@ -779,7 +772,7 @@ async function scrapeProductPage(url) {
             (function add(mainHeader, iterator) {
 
                 const found = mainHeader.some(el => el.id === iterator.title);
-                if (!found) console.log("NOT FOUND: ", iterator.title);
+                // if (!found) console.log("NOT FOUND: ", iterator.title);
                 if (!found) mainHeader.push({ id: iterator.title, title: iterator.title });
                 if (!found) mainHeader.push({ id: 'variantion ' + iterator.title, title: 'variantion ' + iterator.title });
                 return mainHeader;
@@ -793,7 +786,7 @@ async function scrapeProductPage(url) {
         (function add(mainHeader, item) {
 
             const found = mainHeader.some(el => el.id === item);
-            if (!found) console.log("NOT FOUND: ", item);
+            // if (!found) console.log("NOT FOUND: ", item);
             if (!found) mainHeader.push({ id: item, title: item });
             if (!found) header.push({ id: item, title: item });
             return mainHeader;
@@ -807,7 +800,7 @@ async function scrapeProductPage(url) {
         (function add(mainHeader, item, item2, item3, item4, item5, item6, item7) {
 
             const found = mainHeader.some(el => el.id === item);
-            if (!found) console.log("NOT FOUND: ", item);
+            // if (!found) console.log("NOT FOUND: ", item);
             if (!found) mainHeader.push({ id: item, title: item });
             if (!found) header.push({ id: item, title: item });
 
@@ -851,21 +844,6 @@ async function scrapeProductPage(url) {
 
         mainSource.push(source);
 
-        // //  CREATE NEW CSV DOCUMENT
-        // const csv = createCSV({
-        //     path: `${productName}.csv`,
-        //     header: header
-        // });
-
-        // //  WRITE DATA ROWS
-        // await csv.writeRecords([
-        //     source
-
-        //     ])
-        //     .then(() => {
-        //         console.log("Done!");
-        //     });
-
 
         const urlsVariants = await page.evaluate(() =>
             Array.from(
@@ -890,6 +868,12 @@ async function scrapeProductPage(url) {
             }
         }
 
+        if (setFileName && category1 !== '') {
+            fileName = category1 + category2;
+            setFileName = false;
+        } else {
+            fileName = 'results';
+        }
         totalSrapes++;
         console.log("totatl scrapes: ", totalSrapes);
 
@@ -906,8 +890,9 @@ async function scrapeProductPage(url) {
                 return console.log(err);
             }
 
-            console.log("The file was saved!");
+            console.log("log.txt file was saved!");
         });
+
     }
 
     // for single link
