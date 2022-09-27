@@ -33,8 +33,17 @@ async function scrapeProductPage(url) {
 
     await page.click('#idp-discovery-submit');
 
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(4300);
     //---type password
+    // selecting by class name = password-with-toggle
+    await page.type('.password-with-toggle', siteLink.password);
+
+    await page.waitForTimeout(2500);
+
+    // selecting by class name = .button button-primary
+    await page.click('.button');
+
+    await page.waitForTimeout(2500);
     //---from here take it manualy
 
     //await page.click('.button button-primary');
