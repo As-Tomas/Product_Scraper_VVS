@@ -12,7 +12,7 @@ let totalSrapes = 0;
 
 
 
-async function scrapeProductPage(url) {
+async function scrapeProductPage(url, scrapeOne) {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     await page.setUserAgent(
@@ -328,13 +328,13 @@ async function scrapeProductPage(url) {
         }
 
         let productNumber = '';
-        try {                   
+        try {
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[2]  returs gap beatween strings
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[1] NRF
             // not loged in ver //*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[3] Number
             // loged in version //*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/span/div/p/text()[2] Number
             xPath = '//*[@id="content-container"]/main/div[2]/div[2]/div[1]/div[2]/section/hgroup/div[1]/span/div/p/text()[3]'
-    
+
             if (logedIn) {
                 xPath =
                     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[2]/section/hgroup/div[1]/span/div/p/text()[3]';
@@ -421,7 +421,7 @@ async function scrapeProductPage(url) {
             );
             const texteelsalePrice = await elsalePrice.getProperty("textContent");
             salePrice = await texteelsalePrice.jsonValue();
-        } catch (error) { 
+        } catch (error) {
             // console.log('cant find price');
         }
         let newsalePrice = salePrice.replace("kr ", "");
@@ -549,9 +549,7 @@ async function scrapeProductPage(url) {
         let documentstextContent1 = '';
         let documentstextContent2 = '';
         let documentstextContent3 = '';
-        //*[@id="documents-content"]/div/div/div/a
-        //*[@id="documents-content"]/div/div/div[1]/a
-        //*[@id="documents-content"]/div/div/div[2]/a
+
         try {
 
             const [el3] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
@@ -571,9 +569,9 @@ async function scrapeProductPage(url) {
             }
 
             try {
-                const [el3b] = await page.$x('//*[@id="documents-content"]/div/div/div[2]/a');
-                const textContentel3b = await el3b.getProperty("textContent ");
-                documentstextContent1 = await textContentel3b.jsonValue();
+                const [el3ba] = await page.$x('//*[@id="documents-content"]/div/div/div[2]/a');
+                const textContentel3ba = await el3ba.getProperty("textContent");
+                documentstextContent1 = await textContentel3ba.jsonValue();
 
             } catch (error) {
                 console.log("cant find documentstextContent (documentation) Nr 2 ");
@@ -598,11 +596,13 @@ async function scrapeProductPage(url) {
             }
         }
 
-        if (documentstextContent1 === '') {
+        let emptyTextContent = documentstextContent1;
+
+        if (emptyTextContent === '') {
             try {
-                const [el3b] = await page.$x('//*[@id="documents-content"]/div/div/div[2]/a');
-                const textContentel3b = await el3b.getProperty("textContent ");
-                documentstextContent1 = await textContentel3b.jsonValue();
+                const [el3ba] = await page.$x('//*[@id="documents-content"]/div/div/div[2]/a');
+                const textContentel3ba = await el3ba.getProperty("textContent");
+                documentstextContent1 = await textContentel3ba.jsonValue();
 
             } catch (error) {
                 console.log("cant find documentstextContent (documentation) Nr 2 ");
@@ -631,7 +631,7 @@ async function scrapeProductPage(url) {
         let documentsLink1 = '';
         let documentsLink2 = '';
         let documentsLink3 = '';
-        try {                       
+        try {
             const [el4] = await page.$x('//*[@id="documents-content"]/div/div/div/a');
             const href = await el4.getProperty("href");
             documentsLink = await href.jsonValue();
@@ -706,6 +706,7 @@ async function scrapeProductPage(url) {
 
         // let collumnNameVariations = ""; NOT USING
         const variations = [];
+        let productsHandlesVar;
         try {
             // const [elCollumnName5] = await page.$x(
             //     '//*[@id="content-container"]/main/div[2]/div[2]/div[2]/div[1]/h3'
@@ -715,22 +716,30 @@ async function scrapeProductPage(url) {
             // );
             // collumnNameVariations = await textelCollumnName5.jsonValue();
 
-            // #content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(2) > div.b2.go.dx.gp > article:nth-child(1)
-            const productsHandlesVar = await page.$$(
-                "#content-container > main > div > div:nth-child(2) > div:nth-child(2) > div > article"
-            );
+            // loged in  #content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(3) > div.b2.gq.eu.gr > article:nth-child(1) > a > section > div:nth-child(1) > div > span > p
+            // loged out #content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(2) > div.b2.gl.dx.gm > article:nth-child(1) > a > section > div:nth-child(1) > div > span > p
+            if (logedIn) {
+                productsHandlesVar = await page.$$(
+                    "#content-container > main > div > div:nth-child(2) > div:nth-child(3) > div > article"
+                );
+            } else {
+                productsHandlesVar = await page.$$(
+                    "#content-container > main > div > div:nth-child(2) > div:nth-child(2) > div > article"
+                );
+
+            }
             //#content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(2) > div > article:nth-child(1)
             //#content-container > main > div.n.o.c1.q > div:nth-child(2) > div.n.o.p.b1.hc > div > div > div > div > div:nth-child(1) > article > a > section
             for (const producthandle of productsHandlesVar) {
                 //#content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(2) > div.b2.go.dx.gp > article:nth-child(1) > a > section > div:nth-child(1) > h3
                 try {
                     const title = await page.evaluate(
-
-                        // article:nth-child(1) > a > section > div:nth-child(1) > h3
+                        
+                        //#content-container > main > div.n.o.c1.q > div:nth-child(2) > div:nth-child(3) > div > article > a > section > div > h3
                         (el) => el.querySelector(" a > section > div> h3").textContent,
                         producthandle
                     );
-
+                    
                     const variantproductNumber = await page.evaluate(
                         (el) => el.querySelector(" p ").textContent,
                         producthandle
@@ -747,7 +756,10 @@ async function scrapeProductPage(url) {
                     // );
                     //const variationUrl = await elvariationUrl.jsonValue();
 
-                    let newValue = variantproductNumber.replace("NRF ", "");
+                    let newValue = await variantproductNumber.replace("NRF ", "");
+
+                    console.log("CnewValuenewValuenewValuenewValuenewValue", newValue);
+                    console.log("variantproductNumbervariantproductNumbervariantproductNumbervariantproductNumber", variantproductNumber);
 
                     variations.push({
                         title: title,
@@ -758,7 +770,9 @@ async function scrapeProductPage(url) {
                 }
             }
         } catch (error) { console.log("Cnat get Variations 1", error); }
-        
+
+        console.log("VAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", variations);
+
 
         // working with data------------------------------------------------ ↓↓↓
 
@@ -901,10 +915,13 @@ async function scrapeProductPage(url) {
             variationsGroup.push(prodNr.variantionProductNumber);
         }
 
+        console.log("VAAAAAAAAAAAAAA variationsGroup AAAAAAAAAAAAAAAAAAAAAAA", variationsGroup);
+
         const found = mainHeader.some(el => el.id === 'variations');
         // if (!found) console.log("NOT FOUND: ", iterator.title);
         if (!found) mainHeader.push({ id: 'variations', title: 'VARIATIONS' });
         source['variations'] = variationsGroup;
+        console.log("VAAAAAAAAAAAAAA variationsGroup  sourceAAAAAAAAAAAAAAAAAAAAAAA", source['variations']);
 
         //--add to mainHeader
 
@@ -953,12 +970,11 @@ async function scrapeProductPage(url) {
             if (!found9) mainHeader.push({ id: item9, title: item9 });
             return mainHeader;
 
-        })(mainHeader, 'collumnName4', 'documentstextContent', 'documentsLink', 'documentstextContent1', 
-        'documentsLink1', 'documentstextContent2', 'documentsLink2', 'documentstextContent3', 
-        'documentsLink3');
+        })(mainHeader, 'collumnName4', 'documentstextContent', 'documentsLink', 'documentstextContent1',
+            'documentsLink1', 'documentstextContent2', 'documentsLink2', 'documentstextContent3',
+            'documentsLink3');
         //-- end of it
 
-        // todo add remove those aditions to header its unused at all...
 
         source['collumnName4'] = collumnName4;
         source['documentstextContent'] = documentstextContent;
@@ -971,6 +987,7 @@ async function scrapeProductPage(url) {
         source['documentsLink3'] = documentsLink3;
 
         mainSource.push(source);
+        console.log("mainSourceOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", mainSource)
 
 
         const urlsVariants = await page.evaluate(() =>
@@ -1022,31 +1039,36 @@ async function scrapeProductPage(url) {
 
     }
 
-    // for single link
-
-    await scrape(url);
-    //scrape variantions
-    if (!scrapeOneLevelDeep) {
-        for (const varUrl of variantsUrls) {
-            await scrape(varUrl);
+    if (scrapeOne) {
+        // for single link
+        await scrape(url);
+        //scrape variantions
+        if (!scrapeOneLevelDeep) {
+            for (const varUrl of variantsUrls) {
+                await scrape(varUrl);
+            }
+            scrapeOneLevelDeep = true;
         }
-        scrapeOneLevelDeep = true;
+
+    } else {
+        // for array of links
+
+        for (const url of siteLink.productsArray) {
+            await scrape(url);
+
+            //scrape variantions
+            if (!scrapeOneLevelDeep) {
+                for (const varUrl of variantsUrls) {
+                    await scrape(varUrl);
+                }
+                scrapeOneLevelDeep = true;
+            }
+        }
+
     }
 
 
-    // for array of links
 
-    //     for (const url of siteLink.productsArray) {
-    //         await scrape(url);
-
-    //         //scrape variantions
-    //         if (!scrapeOneLevelDeep) {
-    //             for (const varUrl of variantsUrls) {
-    //                 await scrape(varUrl);
-    //             }
-    //             scrapeOneLevelDeep = true;
-    //         }
-    //    }
 
 
 
@@ -1071,11 +1093,11 @@ async function scrapeProductPage(url) {
     //browser.close();
 }
 
-// for single link
-scrapeProductPage(siteLink.productLink);
+// for single : link, true
+// scrapeProductPage(siteLink.productLink, true);
 
-// for array of links
-// scrapeProductPage(siteLink.productsArray);
+// for array of links : array, false
+scrapeProductPage(siteLink.productsArray, false);
 
 
 
